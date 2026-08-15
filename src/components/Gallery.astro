@@ -1,0 +1,82 @@
+---
+// Steam-style gallery: main image with thumbnail strip; main image click opens lightbox
+interface Props {
+  images: string[];
+  title: string;
+}
+const { images, title } = Astro.props;
+---
+
+<div data-gallery>
+  <button type="button" class="block w-full cursor-zoom-in overflow-hidden rounded-blob" data-gallery-main aria-label="Zväčšiť fotografiu">
+    <img
+      src={images[0]}
+      alt={`${title} – fotografia`}
+      width="1200"
+      height="800"
+      class="aspect-[3/2] w-full object-cover"
+      fetchpriority="high"
+      data-gallery-main-img
+    />
+  </button>
+  {images.length > 1 && (
+    <div class="mt-3 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Náhľady fotografií">
+      {images.map((src, i) => (
+        <button
+          type="button"
+          class:list={[
+            'w-20 shrink-0 overflow-hidden rounded-xl ring-2 transition sm:w-24',
+            i === 0 ? 'ring-brand-blue' : 'ring-transparent opacity-70 hover:opacity-100',
+          ]}
+          data-gallery-thumb={i}
+          aria-label={`Fotografia ${i + 1}`}
+        >
+          <img src={src} alt="" width="1200" height="800" loading="lazy" class="aspect-[3/2] w-full object-cover" />
+        </button>
+      ))}
+    </div>
+  )}
+</div>
+
+<dialog
+  data-gallery-dialog
+  class="m-auto w-full max-w-4xl rounded-2xl bg-transparent p-0 backdrop:bg-ink/90"
+>
+  <img src={images[0]} alt="" class="w-full rounded-2xl" data-gallery-img />
+  <div class="mt-3 flex justify-center gap-3">
+    <button type="button" data-gallery-prev class="btn-light !px-5 !py-2 text-sm">← Predošlá</button>
+    <button type="button" data-gallery-close class="btn-light !px-5 !py-2 text-sm">Zavrieť</button>
+    <button type="button" data-gallery-next class="btn-light !px-5 !py-2 text-sm">Ďalšia →</button>
+  </div>
+</dialog>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const dialog = gallery.nextElementSibling as HTMLDialogElement;
+    const mainImg = gallery.querySelector<HTMLImageElement>('[data-gallery-main-img]')!;
+    const dialogImg = dialog.querySelector<HTMLImageElement>('[data-gallery-img]')!;
+    const thumbs = [...gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-thumb]')];
+    const sources = thumbs.length ? thumbs.map((t) => t.querySelector('img')!.src) : [mainImg.src];
+    let index = 0;
+
+    const select = (i: number) => {
+      index = (i + sources.length) % sources.length;
+      mainImg.src = sources[index];
+      dialogImg.src = sources[index];
+      thumbs.forEach((t, ti) => {
+        t.classList.toggle('ring-brand-blue', ti === index);
+        t.classList.toggle('ring-transparent', ti !== index);
+        t.classList.toggle('opacity-70', ti !== index);
+      });
+    };
+
+    thumbs.forEach((t) => t.addEventListener('click', () => select(Number(t.dataset.galleryThumb))));
+    gallery.querySelector('[data-gallery-main]')?.addEventListener('click', () => dialog.showModal());
+    dialog.querySelector('[data-gallery-prev]')?.addEventListener('click', () => select(index - 1));
+    dialog.querySelector('[data-gallery-next]')?.addEventListener('click', () => select(index + 1));
+    dialog.querySelector('[data-gallery-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  });
+</script>

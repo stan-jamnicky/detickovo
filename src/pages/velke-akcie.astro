@@ -1,0 +1,119 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ServiceGrid from '../components/ServiceGrid.astro';
+import EventCard from '../components/EventCard.astro';
+import ReferenceRow from '../components/ReferenceRow.astro';
+import CTASection from '../components/CTASection.astro';
+
+const largeTypes = ['mesto-obec', 'skola-skolka', 'firma', 'festival'];
+const events = (await getCollection('events'))
+  .filter((e) => largeTypes.includes(e.data.eventType))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const scenarios = [
+  { title: 'Deň detí pre mesto či obec', text: 'Kompletné popoludnie so stanovišťami, súťažami, maskotmi a moderovaním – pre 100 až 1000 detí.', color: 'bg-brand-blue' },
+  { title: 'Firemný rodinný deň', text: 'Detská zóna s dozorom a program, vďaka ktorému si vaši zamestnanci deň skutočne užijú.', color: 'bg-brand-magenta' },
+  { title: 'Školský karneval či MDD', text: 'Diskotéka, promenáda masiek, súťaže a maskoti priamo v telocvični alebo na ihrisku.', color: 'bg-brand-green' },
+  { title: 'Detská zóna na festivale', text: 'Celodenné stanovištia a program, ktoré sa postarajú o detských návštevníkov festivalu.', color: 'bg-brand-orange' },
+];
+
+const steps = [
+  { n: '1', title: 'Pošlete nám nezáväznú objednávku', text: 'Napíšete nám typ akcie, termín, miesto a približný počet detí.' },
+  { n: '2', title: 'Navrhneme program', text: 'Do 24 hodín sa ozveme s návrhom programu a cenovou ponukou na mieru.' },
+  { n: '3', title: 'Doladíme detaily', text: 'Spoločne upravíme program, harmonogram a technické požiadavky.' },
+  { n: '4', title: 'Prídeme a zabavíme', text: 'V deň akcie prídeme s tímom aj technikou. Vy sa už o nič nestaráte.' },
+];
+---
+
+<Base
+  title="Veľké akcie pre mestá, školy a firmy – Detičkovo"
+  description="Kompletný detský program pre dni detí, mestské podujatia, školské akcie, firemné rodinné dni a festivaly. Zvládame akcie pre stovky detí po celom Slovensku."
+>
+  <section class="bg-cream">
+    <div class="container-site py-16 sm:py-24">
+      <span class="kicker">Mestá · Školy · Firmy · Festivaly</span>
+      <h1 class="max-w-3xl text-4xl sm:text-6xl">Detský program pre stovky detí? Naša parketa.</h1>
+      <p class="mt-5 max-w-2xl text-lg text-muted">
+        Od roku 2018 zabávame deti na najväčších podujatiach východného Slovenska.
+        Prídeme s vlastným tímom, maskotmi, technikou a programom presne na mieru vašej akcie.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
+        <a href="#akcie" class="btn-secondary">Ukážky akcií</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Príklady scenárov</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Čo pre vás vieme zorganizovať</h2>
+      <div class="mt-10 grid gap-5 sm:grid-cols-2">
+        {scenarios.map((s) => (
+          <div class="rounded-blob bg-white p-7 ring-1 ring-ink/5">
+            <span class={`mb-4 block h-2.5 w-10 rounded-full ${s.color}`}></span>
+            <h3 class="text-xl">{s.title}</h3>
+            <p class="mt-2 text-muted">{s.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-cream">
+    <div class="container-site">
+      <span class="kicker">Služby</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Z čoho poskladáme váš program</h2>
+      <div class="mt-10">
+        <ServiceGrid />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Ako to prebieha</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Spolupráca v štyroch krokoch</h2>
+      <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((step) => (
+          <div>
+            <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-blue font-display text-lg font-bold text-white">{step.n}</span>
+            <h3 class="mt-4 text-lg">{step.title}</h3>
+            <p class="mt-1.5 text-sm text-muted">{step.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="akcie" class="section bg-cream">
+    <div class="container-site">
+      <span class="kicker">Nechajte sa inšpirovať</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Takto vyzerajú naše veľké akcie</h2>
+      <div class="mt-10 grid gap-6 md:grid-cols-3">
+        {events.map((event) => <EventCard event={event} />)}
+      </div>
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
+        <a href="/akcie" class="btn-secondary">Naše akcie</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Referencie</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Dôverujú nám</h2>
+      <div class="mt-10">
+        <ReferenceRow />
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    title="Chystáte veľkú akciu?"
+    text="Pošlite nám termín a počet detí. Do 24 hodín dostanete návrh programu aj cenovú ponuku."
+  />
+</Base>

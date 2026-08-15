@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import site from '../data/site.json';
+---
+
+<Base
+  title="Kontakt – Detičkovo"
+  description="Kontaktujte Detičkovo – detský program a zábava na akcie po celom Slovensku. Telefón, e-mail a sociálne siete."
+>
+  <section class="bg-cream">
+    <div class="container-site py-16 sm:py-20">
+      <span class="kicker">Kontakt</span>
+      <h1 class="max-w-2xl text-4xl sm:text-5xl">Porozprávajme sa o vašej akcii</h1>
+      <p class="mt-4 max-w-xl text-muted">Najrýchlejšie nás zastihnete cez nezáväznú objednávku. Radi si však zavoláme aj napíšeme.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site grid gap-6 sm:grid-cols-3">
+      <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="rounded-blob bg-cream p-7 transition-shadow hover:shadow-lg">
+        <p class="text-sm font-bold uppercase tracking-widest text-brand-blue">Telefón</p>
+        <p class="mt-2 font-display text-xl font-bold">{site.phoneDisplay}</p>
+        <p class="mt-1 text-sm text-muted">Po–Pia 9:00–17:00</p>
+      </a>
+      <a href={`mailto:${site.email}`} class="rounded-blob bg-cream p-7 transition-shadow hover:shadow-lg">
+        <p class="text-sm font-bold uppercase tracking-widest text-brand-green">E-mail</p>
+        <p class="mt-2 font-display text-xl font-bold">{site.email}</p>
+        <p class="mt-1 text-sm text-muted">Odpovedáme do 24 hodín</p>
+      </a>
+      <div class="rounded-blob bg-cream p-7">
+        <p class="text-sm font-bold uppercase tracking-widest text-brand-magenta">Pôsobnosť</p>
+        <p class="mt-2 font-display text-xl font-bold">{site.city}</p>
+        <div class="mt-3 flex gap-4 text-sm font-semibold">
+          <a href={site.facebook} rel="noopener" target="_blank" class="text-brand-blue hover:underline">Facebook</a>
+          <a href={site.instagram} rel="noopener" target="_blank" class="text-brand-blue hover:underline">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="container-site mt-12 text-center">
+      <a href="/objednavka" class="btn-primary">Poslať nezáväznú objednávku</a>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,12 @@
+# Redirects from the old WordPress site (Cloudflare Pages format)
+/cennik / 301
+/cennik-maskotov /narodeniny 301
+/detska-party-na-vasej-akcii /velke-akcie 301
+/narodeninove-oslavy /narodeniny 301
+/mobilne-detickovo /velke-akcie 301
+/kurz-streda / 301
+/priprava-na-ms-montessori / 301
+/denny-letny-tabor-2026 / 301
+/contact /kontakt 301
+/dopyt /objednavka 301
+/dopyt/dakujeme /objednavka/dakujeme 301

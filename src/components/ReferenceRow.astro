@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+
+const references = (await getCollection('references')).sort((a, b) => a.data.order - b.data.order);
+const accents = ['text-brand-blue', 'text-brand-magenta', 'text-brand-green', 'text-brand-orange'];
+const bars = ['bg-brand-blue', 'bg-brand-magenta', 'bg-brand-green', 'bg-brand-orange'];
+---
+
+<div class="grid gap-6 sm:grid-cols-2">
+  {references.map((ref, i) => (
+    <figure class="relative overflow-hidden rounded-blob bg-white p-8 pt-10 shadow-lg shadow-ink/5 ring-1 ring-ink/5">
+      <span class={`absolute inset-x-0 top-0 h-1.5 ${bars[i % bars.length]}`} aria-hidden="true"></span>
+      <span class={`absolute right-6 top-4 font-display text-7xl font-extrabold leading-none opacity-15 ${accents[i % accents.length]}`} aria-hidden="true">“</span>
+      {ref.data.quote && (
+        <blockquote class="relative font-display text-lg font-semibold leading-snug text-ink sm:text-xl">
+          „{ref.data.quote}“
+        </blockquote>
+      )}
+      <figcaption class="mt-5 flex items-center gap-3">
+        {ref.data.logo && <img src={ref.data.logo} alt="" class="h-9 w-9 rounded-full object-cover" loading="lazy" />}
+        <span class={`h-2 w-2 rounded-full ${bars[i % bars.length]}`} aria-hidden="true"></span>
+        <span class="text-sm font-bold text-muted">{ref.data.name}</span>
+      </figcaption>
+    </figure>
+  ))}
+</div>

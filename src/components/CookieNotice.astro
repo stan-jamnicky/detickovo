@@ -1,0 +1,23 @@
+<div
+  id="cookie-notice"
+  hidden
+  class="fixed inset-x-0 bottom-0 z-50 border-t border-ink/10 bg-white/95 backdrop-blur"
+  role="region"
+  aria-label="Informácia o súkromí"
+>
+  <div class="container-site flex flex-col items-start gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm text-muted">
+      🍪 Táto stránka nepoužíva sledovacie ani marketingové cookies. Vaše údaje spracúvame len keď nám ich pošlete.&nbsp;<a href="/ochrana-sukromia" class="font-semibold text-brand-blue hover:underline">Viac o ochrane súkromia</a>
+    </p>
+    <button id="cookie-notice-ok" class="btn-primary !px-5 !py-2 text-sm">Rozumiem</button>
+  </div>
+</div>
+
+<script>
+  const notice = document.getElementById('cookie-notice')!;
+  if (!localStorage.getItem('cookie-notice-dismissed')) notice.hidden = false;
+  document.getElementById('cookie-notice-ok')?.addEventListener('click', () => {
+    localStorage.setItem('cookie-notice-dismissed', '1');
+    notice.hidden = true;
+  });
+</script>

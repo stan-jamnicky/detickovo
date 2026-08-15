@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import site from '../data/site.json';
+---
+
+<Base
+  title="Ochrana súkromia – Detičkovo"
+  description="Informácie o spracovaní osobných údajov na stránke Detičkovo."
+>
+  <section class="section">
+    <div class="container-site max-w-3xl">
+      <h1 class="text-3xl sm:text-4xl">Ochrana súkromia</h1>
+      <div class="mt-8 space-y-6 text-muted">
+        <p>
+          Táto stránka nepoužíva analytické ani marketingové cookies. Nezbierame žiadne údaje
+          o návštevníkoch okrem tých, ktoré nám sami dobrovoľne pošlete cez objednávkový formulár.
+        </p>
+        <h2 class="text-xl text-ink">Cookies a lokálne úložisko</h2>
+        <p>
+          Nepoužívame žiadne sledovacie cookies tretích strán. V prehliadači ukladáme jedinú
+          technickú informáciu – to, že ste zavreli lištu s upozornením o súkromí. Táto informácia
+          neopustí vaše zariadenie a môžete ju kedykoľvek vymazať v nastaveniach prehliadača.
+        </p>
+        <h2 class="text-xl text-ink">Objednávkový formulár</h2>
+        <p>
+          Údaje z formulára (meno, e-mail, telefón a informácie o plánovanej akcii) používame
+          výlučne na prípravu ponuky a komunikáciu s vami, na základe vášho súhlasu podľa čl. 6
+          ods. 1 písm. a) GDPR. Neposkytujeme ich tretím stranám na marketingové účely a po vybavení
+          objednávky ich uchovávame len po dobu nevyhnutnú na účely účtovníctva a prípadnej
+          ďalšej spolupráce.
+        </p>
+        <h2 class="text-xl text-ink">Vaše práva</h2>
+        <p>
+          Kedykoľvek nás môžete požiadať o výpis, opravu alebo vymazanie vašich údajov
+          na adrese <a href={`mailto:${site.email}`} class="text-brand-blue hover:underline">{site.email}</a>.
+          Máte tiež právo podať sťažnosť na Úrad na ochranu osobných údajov SR.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

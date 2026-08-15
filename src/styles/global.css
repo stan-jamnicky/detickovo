@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/inter";
+
+@theme {
+  --color-brand-red: #ed2d28;
+  --color-brand-magenta: #c94096;
+  --color-brand-orange: #fbb02f;
+  --color-brand-yellow: #f1ea38;
+  --color-brand-green: #70be44;
+  --color-brand-blue: #00adee;
+  --color-brand-blue-dark: #008fc5;
+  --color-ink: #1d2433;
+  --color-muted: #5b6472;
+  --color-cream: #faf7f1;
+  --color-sand: #f3eee4;
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --radius-blob: 2rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-ink font-sans antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display font-bold tracking-tight text-balance;
+  }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 font-display font-semibold text-base transition-colors duration-150 cursor-pointer;
+}
+@utility btn-primary {
+  @apply btn bg-brand-blue text-white hover:bg-brand-blue-dark;
+}
+@utility btn-secondary {
+  @apply btn bg-transparent text-ink ring-2 ring-ink/15 ring-inset hover:ring-ink/40;
+}
+@utility btn-light {
+  @apply btn bg-white text-ink hover:bg-cream;
+}
+@utility chip {
+  @apply inline-flex items-center gap-1.5 rounded-full bg-sand px-3 py-1 text-sm font-medium text-ink;
+}
+@utility container-site {
+  @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+}
+@utility section {
+  @apply py-16 sm:py-24;
+}
+@utility kicker {
+  @apply mb-3 block font-display text-sm font-bold uppercase tracking-widest text-brand-blue;
+}

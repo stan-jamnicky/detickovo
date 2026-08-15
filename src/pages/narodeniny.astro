@@ -1,0 +1,95 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Confetti from '../components/Confetti.astro';
+import EventCard from '../components/EventCard.astro';
+import CTASection from '../components/CTASection.astro';
+
+const mascots = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order);
+const events = (await getCollection('events'))
+  .filter((e) => e.data.eventType === 'narodeniny')
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const included = [
+  { icon: '🐻', title: 'Maskot podľa výberu', text: 'Oslávenca privíta jeho obľúbená postavička.' },
+  { icon: '🎈', title: 'Animátor s programom', text: 'Hry, súťaže a tance prispôsobené veku detí.' },
+  { icon: '🎨', title: 'Maľovanie na tvár', text: 'Každé dieťa odchádza s vysnívanou maskou.' },
+  { icon: '🎀', title: 'Balóniky pre všetkých', text: 'Modelovanie balónikov priamo na oslave.' },
+];
+---
+
+<Base
+  title="Narodeninová oslava u vás doma – Detičkovo"
+  description="Narodeninová párty s maskotom a animátorom u vás doma, na záhrade alebo v prenajatom priestore. Kompletný program, vy si užívate oslavu bez stresu."
+>
+  <section class="relative overflow-hidden bg-cream">
+    <div class="container-site relative py-16 sm:py-24">
+      <Confetti class="absolute right-0 top-2 hidden w-32 md:block lg:w-40" />
+      <span class="kicker">Narodeninové oslavy</span>
+      <h1 class="max-w-3xl text-4xl sm:text-6xl">Oslava, o ktorej budú deti rozprávať celý rok</h1>
+      <p class="mt-5 max-w-2xl text-lg text-muted">
+        Prídeme k vám domov, na záhradu alebo do prenajatého priestoru.
+        Maskot, animátor a dve hodiny zábavy – vy si medzitým vychutnáte kávu a fotíte.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/objednavka?typ=narodeniny" class="btn-primary">Naplánovať oslavu</a>
+        <a href="#maskoti" class="btn-secondary">Vybrať maskota</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Čo je v cene</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Kompletná párty bez starostí</h2>
+      <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {included.map((item) => (
+          <div class="rounded-blob bg-cream p-6">
+            <span class="text-3xl" aria-hidden="true">{item.icon}</span>
+            <h3 class="mt-3 text-lg">{item.title}</h3>
+            <p class="mt-1.5 text-sm text-muted">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section id="maskoti" class="section bg-cream">
+    <div class="container-site">
+      <span class="kicker">Naši maskoti</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Koho si oslávenec vyberie?</h2>
+      <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {mascots.map((m) => (
+          <div class="overflow-hidden rounded-blob bg-white ring-1 ring-ink/5">
+            <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="aspect-square w-full object-cover" />
+            <p class="p-4 text-center font-display font-bold">{m.data.name}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {events.length > 0 && (
+    <section class="section">
+      <div class="container-site">
+        <span class="kicker">Ako to vyzerá</span>
+        <h2 class="max-w-xl text-3xl sm:text-4xl">Oslavy, ktoré sme pripravili</h2>
+        <div class="mt-10 grid gap-6 md:grid-cols-3">
+          {events.map((event) => <EventCard event={event} />)}
+        </div>
+        <div class="mt-10 flex flex-wrap justify-center gap-3">
+          <a href="/objednavka?typ=narodeniny" class="btn-primary">Overiť dostupnosť termínu</a>
+          <a href="/akcie" class="btn-secondary">Naše akcie</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CTASection
+    title="Kedy má váš drobec narodeniny?"
+    text="Napíšte nám termín, miesto a počet detí. Ozveme sa s ponukou maskotov a programu."
+    primaryLabel="Naplánovať oslavu"
+    primaryHref="/objednavka?typ=narodeniny"
+  />
+</Base>

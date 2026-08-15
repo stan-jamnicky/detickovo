@@ -1,0 +1,145 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Confetti from '../components/Confetti.astro';
+import EventTypeTiles from '../components/EventTypeTiles.astro';
+import ServiceGrid from '../components/ServiceGrid.astro';
+import EventCard from '../components/EventCard.astro';
+import StatBand from '../components/StatBand.astro';
+import ReferenceRow from '../components/ReferenceRow.astro';
+import CTASection from '../components/CTASection.astro';
+
+const events = (await getCollection('events')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const featured = events.filter((e) => e.data.featured).slice(0, 3);
+const recent = featured.length >= 3 ? featured : events.slice(0, 3);
+---
+
+<Base
+  title="Detičkovo – Detský program a zábava na vašu akciu"
+  description="Zábavu na vašu akciu prinesieme my. Maskoti, animátori a kompletný detský program pre mestá, školy, firmy, svadby aj narodeninové oslavy po celom Slovensku."
+>
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-cream">
+    <div class="container-site grid items-center gap-10 py-16 sm:py-24 lg:grid-cols-2">
+      <div class="relative">
+        <Confetti class="absolute -top-14 left-0 hidden w-28 sm:block md:-top-16 md:w-32" />
+        <h1 class="text-4xl sm:text-6xl">Zábavu na vašu akciu prinesieme my.</h1>
+        <p class="mt-5 max-w-lg text-lg text-muted">
+          Maskoti, animátori a kompletný detský program pre mestá, školy, firmy, svadby aj oslavy.
+          Vy organizujete, my zabávame.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/objednavka" class="btn-primary">Naplánovať akciu</a>
+          <a href="/akcie" class="btn-secondary">Pozrieť naše akcie</a>
+        </div>
+      </div>
+      <div class="relative">
+        <img
+          src="/uploads/hero.svg"
+          alt="Deti na akcii s animátormi Detičkova"
+          width="1200"
+          height="800"
+          class="rounded-blob object-cover shadow-2xl shadow-ink/10"
+          fetchpriority="high"
+        />
+        <span class="absolute -bottom-4 -left-4 h-10 w-10 rounded-full bg-brand-orange" aria-hidden="true"></span>
+        <span class="absolute -top-4 -right-3 h-7 w-7 rounded-full bg-brand-green" aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Event type picker -->
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Kde budeme zabávať?</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Akú akciu pripravujete?</h2>
+      <div class="mt-10">
+        <EventTypeTiles />
+      </div>
+    </div>
+  </section>
+
+  <!-- Large events -->
+  <section class="section bg-cream">
+    <div class="container-site grid items-center gap-10 lg:grid-cols-2">
+      <div>
+        <span class="kicker">Naša špecialita</span>
+        <h2 class="text-3xl sm:text-4xl">Veľké akcie pre stovky detí</h2>
+        <p class="mt-4 text-muted">
+          Dni detí, mestské festivaly, školské podujatia či firemné rodinné dni – zvládame akcie
+          pre desiatky aj stovky detí. Prídeme s vlastným tímom, technikou a programom na mieru,
+          vy sa staráte len o zvyšok podujatia.
+        </p>
+        <ul class="mt-6 space-y-3 text-ink">
+          <li class="flex items-start gap-3"><span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-blue"></span>Program na mieru podľa veku a počtu detí</li>
+          <li class="flex items-start gap-3"><span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-green"></span>Vlastný tím maskotov a animátorov</li>
+          <li class="flex items-start gap-3"><span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-magenta"></span>Ozvučenie a moderovanie v cene</li>
+        </ul>
+        <a href="/velke-akcie" class="btn-primary mt-8">Viac o veľkých akciách</a>
+      </div>
+      <img
+        src="/uploads/event-festival.svg"
+        alt="Detská zóna na mestskom festivale"
+        width="1200"
+        height="800"
+        loading="lazy"
+        class="rounded-blob object-cover"
+      />
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Čo vieme zabezpečiť</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Všetko pre detský program na jednom mieste</h2>
+      <div class="mt-10">
+        <ServiceGrid />
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent events -->
+  <section class="section bg-cream">
+    <div class="container-site">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <span class="kicker">Príbehy z akcií</span>
+          <h2 class="text-3xl sm:text-4xl">Nedávne akcie</h2>
+        </div>
+        <a href="/akcie" class="btn-secondary !px-5 !py-2.5 text-sm">Všetky akcie</a>
+      </div>
+      <div class="mt-10 grid gap-6 md:grid-cols-3">
+        {recent.map((event) => <EventCard event={event} />)}
+      </div>
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
+        <a href="/akcie" class="btn-secondary">Naše akcie</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Detičkovo -->
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Prečo Detičkovo</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Skúsenosti, na ktoré sa môžete spoľahnúť</h2>
+      <div class="mt-12">
+        <StatBand />
+      </div>
+    </div>
+  </section>
+
+  <!-- References -->
+  <section class="section bg-cream">
+    <div class="container-site">
+      <span class="kicker">Referencie</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Povedali o nás</h2>
+      <div class="mt-10">
+        <ReferenceRow />
+      </div>
+    </div>
+  </section>
+
+  <CTASection />
+</Base>

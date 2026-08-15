@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+  {services.map((s) => (
+    <div class="rounded-blob bg-cream p-6">
+      <span class="text-3xl" aria-hidden="true">{s.data.icon}</span>
+      <h3 class="mt-3 text-lg">{s.data.title}</h3>
+      <p class="mt-1.5 text-sm text-muted">{s.data.description}</p>
+    </div>
+  ))}
+</div>

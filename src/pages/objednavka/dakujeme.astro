@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro';
+import Confetti from '../../components/Confetti.astro';
+import site from '../../data/site.json';
+---
+
+<Base title="Objednávka odoslaná – Detičkovo" description="Vaša nezáväzná objednávka bola odoslaná. Ozveme sa vám do 24 hodín.">
+  <section class="section">
+    <div class="container-site relative max-w-2xl py-16 text-center">
+      <Confetti class="absolute -top-6 left-1/2 w-40 -translate-x-1/2" />
+      <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-green text-3xl text-white">✓</span>
+      <h1 class="mt-6 text-3xl sm:text-4xl">Objednávka je u nás!</h1>
+      <p class="mt-4 text-muted">Ďakujeme za dôveru. Takto to bude pokračovať:</p>
+      <ol class="mx-auto mt-8 max-w-md space-y-4 text-left">
+        <li class="flex gap-4">
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-blue font-display font-bold text-white">1</span>
+          <p class="text-sm"><strong>Do 24 hodín</strong> sa vám ozveme e-mailom alebo telefonicky.</p>
+        </li>
+        <li class="flex gap-4">
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-blue font-display font-bold text-white">2</span>
+          <p class="text-sm">Pošleme vám <strong>návrh programu a cenovú ponuku</strong> na mieru.</p>
+        </li>
+        <li class="flex gap-4">
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-blue font-display font-bold text-white">3</span>
+          <p class="text-sm">Po odsúhlasení <strong>rezervujeme termín</strong> a doladíme detaily.</p>
+        </li>
+      </ol>
+      <p class="mt-8 text-sm text-muted">Ponáhľate sa? Volajte <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="font-semibold text-brand-blue hover:underline">{site.phoneDisplay}</a>.</p>
+      <a href="/akcie" class="btn-secondary mt-8">Pozrieť si naše akcie</a>
+    </div>
+  </section>
+</Base>

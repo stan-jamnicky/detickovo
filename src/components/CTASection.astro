@@ -1,0 +1,29 @@
+---
+import Confetti from './Confetti.astro';
+
+interface Props {
+  title?: string;
+  text?: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+}
+const {
+  title = 'Plánujete akciu?',
+  text = 'Napíšte nám, čo chystáte, a do 24 hodín sa vám ozveme s návrhom programu aj dostupnosťou termínu.',
+  primaryLabel = 'Overiť dostupnosť',
+  primaryHref = '/objednavka',
+} = Astro.props;
+---
+
+<section class="section relative overflow-hidden bg-ink text-white">
+  <Confetti class="absolute left-4 top-6 hidden w-32 opacity-70 sm:block sm:w-40" />
+  <Confetti class="absolute bottom-6 right-4 hidden w-32 -scale-x-100 opacity-70 sm:block sm:w-40" />
+  <div class="container-site relative text-center">
+    <h2 class="mx-auto max-w-2xl text-3xl sm:text-5xl">{title}</h2>
+    <p class="mx-auto mt-4 max-w-xl text-white/70">{text}</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href={primaryHref} class="btn-primary">{primaryLabel}</a>
+      <a href="/akcie" class="btn bg-white/10 text-white ring-1 ring-white/25 ring-inset hover:bg-white/20">Pozrieť naše akcie</a>
+    </div>
+  </div>
+</section>

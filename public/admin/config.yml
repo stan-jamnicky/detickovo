@@ -1,0 +1,109 @@
+# CMS config — shared by Sveltia/Decap
+backend:
+  name: github
+  repo: OWNER/detickovo # TODO: set the real GitHub repo
+  branch: main
+  # OAuth proxy Cloudflare Worker, see https://github.com/sveltia/sveltia-cms-auth
+  base_url: https://detickovo-cms-auth.example.workers.dev # TODO: deploy worker and set URL
+
+locale: sk
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: events
+    label: Akcie
+    label_singular: Akcia
+    folder: src/content/events
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} – {{location}}"
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: Názov akcie, widget: string }
+      - { name: date, label: Dátum, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      - { name: location, label: Miesto, widget: string }
+      - { name: childrenCount, label: Počet detí, widget: string, hint: "napr. 350+" }
+      - name: eventType
+        label: Typ akcie
+        widget: select
+        options:
+          - { value: mesto-obec, label: Mesto / Obec }
+          - { value: skola-skolka, label: Škola / Škôlka }
+          - { value: firma, label: Firma }
+          - { value: svadba, label: Svadba }
+          - { value: narodeniny, label: Narodeniny }
+          - { value: festival, label: Festival }
+      - name: services
+        label: Použité služby
+        widget: relation
+        collection: services
+        value_field: "{{slug}}"
+        display_fields: [title]
+        multiple: true
+        default: []
+      - { name: cover, label: Titulná fotka, widget: image }
+      - { name: gallery, label: Galéria, widget: list, field: { name: image, label: Fotka, widget: image }, default: [] }
+      - { name: featured, label: Zvýrazniť na úvodnej stránke, widget: boolean, default: false }
+      - name: testimonial
+        label: Referencia od klienta
+        widget: object
+        required: false
+        fields:
+          - { name: quote, label: Citát, widget: text }
+          - { name: author, label: Autor, widget: string }
+      - { name: body, label: Popis akcie, widget: markdown }
+
+  - name: services
+    label: Služby
+    label_singular: Služba
+    folder: src/content/services
+    create: true
+    fields:
+      - { name: title, label: Názov, widget: string }
+      - { name: icon, label: Ikona (emoji), widget: string }
+      - { name: description, label: Popis, widget: text }
+      - { name: order, label: Poradie, widget: number, default: 99 }
+
+  - name: mascots
+    label: Maskoti
+    label_singular: Maskot
+    folder: src/content/mascots
+    create: true
+    fields:
+      - { name: name, label: Meno, widget: string }
+      - { name: photo, label: Fotka, widget: image }
+      - { name: order, label: Poradie, widget: number, default: 99 }
+
+  - name: references
+    label: Referencie
+    label_singular: Referencia
+    folder: src/content/references
+    create: true
+    fields:
+      - { name: name, label: Meno / Organizácia, widget: string }
+      - { name: quote, label: Citát, widget: text, required: false }
+      - { name: logo, label: Logo, widget: image, required: false }
+      - { name: order, label: Poradie, widget: number, default: 99 }
+
+  - name: settings
+    label: Nastavenia webu
+    files:
+      - name: site
+        label: Kontakt a štatistiky
+        file: src/data/site.json
+        fields:
+          - { name: name, label: Názov, widget: string }
+          - { name: tagline, label: Slogan, widget: string }
+          - { name: email, label: E-mail, widget: string }
+          - { name: phone, label: Telefón (medzinárodný), widget: string }
+          - { name: phoneDisplay, label: Telefón (zobrazenie), widget: string }
+          - { name: facebook, label: Facebook URL, widget: string }
+          - { name: instagram, label: Instagram URL, widget: string }
+          - { name: city, label: Pôsobnosť, widget: string }
+          - name: stats
+            label: Štatistiky
+            widget: list
+            fields:
+              - { name: value, label: Hodnota, widget: string }
+              - { name: label, label: Popis, widget: string }
