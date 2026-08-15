@@ -1,5 +1,6 @@
 ---
 import site from '../data/site.json';
+import SocialIcons from './SocialIcons.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -28,10 +29,7 @@ const year = new Date().getFullYear();
     </div>
     <div>
       <p class="font-display font-bold">Sledujte nás</p>
-      <ul class="mt-3 space-y-2 text-sm text-white/70">
-        <li><a href={site.facebook} rel="noopener" target="_blank" class="hover:text-white">Facebook</a></li>
-        <li><a href={site.instagram} rel="noopener" target="_blank" class="hover:text-white">Instagram</a></li>
-      </ul>
+      <SocialIcons class="mt-3 text-white/70" />
       <a href="/objednavka" class="btn-light mt-6 !px-5 !py-2.5 text-sm">Overiť dostupnosť</a>
     </div>
   </div>

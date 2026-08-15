@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { EVENT_TYPES } from '../../lib/eventTypes';
+import SocialIcons from '../../components/SocialIcons.astro';
 import site from '../../data/site.json';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
@@ -47,10 +48,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
       <div class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5">
         <p class="text-xs font-bold uppercase tracking-widest text-brand-magenta">Pôsobnosť</p>
         <p class="mt-1.5 font-display text-lg font-bold">{site.city}</p>
-        <p class="mt-1 flex gap-3 text-sm font-semibold">
-          <a href={site.facebook} rel="noopener" target="_blank" class="text-brand-blue hover:underline">Facebook</a>
-          <a href={site.instagram} rel="noopener" target="_blank" class="text-brand-blue hover:underline">Instagram</a>
-        </p>
+        <SocialIcons class="mt-2 text-brand-blue" />
       </div>
     </div>
   </div>

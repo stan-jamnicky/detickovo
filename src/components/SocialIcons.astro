@@ -1,0 +1,23 @@
+---
+import site from '../data/site.json';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`flex items-center gap-3 ${className}`}>
+  <a href={site.facebook} rel="noopener" target="_blank" aria-label="Facebook" class="transition-opacity hover:opacity-70">
+    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" aria-hidden="true">
+      <path d="M13.4 21v-7.1h2.4l.45-2.95H13.4V9.03c0-.86.3-1.53 1.62-1.53h1.35V4.86c-.3-.04-1.3-.13-2.44-.13-2.42 0-4.03 1.48-4.03 4.15v2.07H7.5v2.95h2.4V21h3.5Z" />
+    </svg>
+  </a>
+  <a href={site.instagram} rel="noopener" target="_blank" aria-label="Instagram" class="transition-opacity hover:opacity-70">
+    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
+    </svg>
+  </a>
+</div>
