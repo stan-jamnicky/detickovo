@@ -12,6 +12,7 @@ import CTASection from '../components/CTASection.astro';
 const events = (await getCollection('events')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const featured = events.filter((e) => e.data.featured).slice(0, 3);
 const recent = featured.length >= 3 ? featured : events.slice(0, 3);
+const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order).slice(0, 6);
 ---
 
 <Base
@@ -95,6 +96,17 @@ const recent = featured.length >= 3 ? featured : events.slice(0, 3);
       <h2 class="max-w-xl text-3xl sm:text-4xl">Všetko pre detský program na jednom mieste</h2>
       <div class="mt-10">
         <ServiceGrid />
+      </div>
+      <div class="mt-12 flex flex-col items-center gap-5 rounded-blob bg-cream p-8 sm:flex-row sm:justify-between">
+        <div class="flex items-center gap-4">
+          <div class="flex -space-x-3">
+            {mascotTeaser.map((m) => (
+              <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="h-12 w-12 rounded-full border-2 border-white object-cover" />
+            ))}
+          </div>
+          <p class="font-display font-bold">20+ maskotov – od Labkovej patroly po Ľadové kráľovstvo</p>
+        </div>
+        <a href="/maskoti" class="btn-primary shrink-0">Pozrieť maskotov</a>
       </div>
     </div>
   </section>

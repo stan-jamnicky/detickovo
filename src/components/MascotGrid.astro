@@ -1,0 +1,127 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  ctaBase?: string;
+  ctaLabel?: string;
+}
+const { ctaBase = '/objednavka?typ=narodeniny', ctaLabel = 'Naplánovať oslavu s maskotmi' } = Astro.props;
+
+const mascots = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order);
+
+const CATEGORIES = [
+  { id: 'labkova-patrola', label: 'Labková patrola' },
+  { id: 'ladove-kralovstvo', label: 'Ľadové kráľovstvo' },
+  { id: 'superhrdinovia', label: 'Superhrdinovia' },
+  { id: 'disney', label: 'Disney' },
+  { id: 'ostatni', label: 'A ďalší' },
+];
+const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.category === c.id));
+---
+
+<div class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter maskotov">
+  <button type="button" class="chip !bg-ink !text-white" data-mascot-filter="all">Všetci</button>
+  {usedCategories.map((c) => (
+    <button type="button" class="chip hover:bg-ink/10" data-mascot-filter={c.id}>{c.label}</button>
+  ))}
+</div>
+
+<p class="mb-4 text-sm text-muted">Ťuknutím maskota vyberiete, lupou si prezriete fotku.</p>
+
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" data-mascot-grid>
+  {mascots.map((m) => (
+    <div class="relative" data-mascot-card data-mascot-category={m.data.category}>
+      <button
+        type="button"
+        aria-pressed="false"
+        data-mascot-select
+        data-mascot-id={m.id}
+        data-mascot-name={m.data.name}
+        class="group w-full overflow-hidden rounded-blob bg-white text-left ring-2 ring-ink/5 transition hover:ring-brand-blue/40 aria-pressed:ring-brand-blue"
+      >
+        <span class="absolute left-3 top-3 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white group-aria-pressed:flex" aria-hidden="true">✓</span>
+        <img
+          src={m.data.photo}
+          alt={m.data.name}
+          width="1200"
+          height="800"
+          loading="lazy"
+          class="aspect-square w-full object-cover"
+        />
+        <span class="block p-4 text-center font-display font-bold transition group-aria-pressed:bg-brand-blue group-aria-pressed:text-white">{m.data.name}</span>
+      </button>
+      <button
+        type="button"
+        data-mascot-zoom
+        data-mascot-name={m.data.name}
+        aria-label={`Zväčšiť fotku – ${m.data.name}`}
+        class="absolute right-3 top-3 z-10 flex h-8 w-8 cursor-zoom-in items-center justify-center rounded-full bg-white/90 text-sm shadow ring-1 ring-ink/10 hover:bg-white"
+      >🔍</button>
+    </div>
+  ))}
+</div>
+
+<div class="mt-8 hidden flex-wrap items-center justify-center gap-4" data-mascot-cta>
+  <p class="font-display font-bold">Vybraní maskoti: <span data-mascot-count class="text-brand-blue">0</span></p>
+  <a href={ctaBase} data-mascot-link data-cta-base={ctaBase} class="btn-primary">{ctaLabel}</a>
+</div>
+
+<dialog data-mascot-dialog class="m-auto w-full max-w-2xl rounded-2xl bg-transparent p-0 backdrop:bg-ink/90">
+  <img src="" alt="" class="w-full rounded-2xl" data-mascot-img />
+  <p class="mt-3 text-center font-display text-xl font-bold text-white" data-mascot-caption></p>
+  <div class="mt-3 flex justify-center">
+    <button type="button" data-mascot-close class="btn-light !px-5 !py-2 text-sm">Zavrieť</button>
+  </div>
+</dialog>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-mascot-filter]');
+  const cards = document.querySelectorAll<HTMLElement>('[data-mascot-card]');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.remove('!bg-ink', '!text-white'));
+      btn.classList.add('!bg-ink', '!text-white');
+      const filter = btn.dataset.mascotFilter;
+      cards.forEach((card) => {
+        card.style.display = filter === 'all' || card.dataset.mascotCategory === filter ? '' : 'none';
+      });
+    });
+  });
+
+  // Selection carried to the order form via ?maskoti= ids
+  const selected = new Set<string>();
+  const cta = document.querySelector<HTMLElement>('[data-mascot-cta]')!;
+  const count = cta.querySelector<HTMLElement>('[data-mascot-count]')!;
+  const link = cta.querySelector<HTMLAnchorElement>('[data-mascot-link]')!;
+
+  document.querySelectorAll<HTMLButtonElement>('[data-mascot-select]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.mascotId!;
+      const pressed = !selected.has(id);
+      pressed ? selected.add(id) : selected.delete(id);
+      btn.setAttribute('aria-pressed', String(pressed));
+      count.textContent = String(selected.size);
+      const base = link.dataset.ctaBase!;
+      link.href = `${base}${base.includes('?') ? '&' : '?'}maskoti=${[...selected].join(',')}`;
+      cta.classList.toggle('hidden', selected.size === 0);
+      cta.classList.toggle('flex', selected.size > 0);
+    });
+  });
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-mascot-dialog]')!;
+  const img = dialog.querySelector<HTMLImageElement>('[data-mascot-img]')!;
+  const caption = dialog.querySelector<HTMLElement>('[data-mascot-caption]')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-mascot-zoom]').forEach((zoom) => {
+    zoom.addEventListener('click', () => {
+      const card = zoom.closest('[data-mascot-card]')!;
+      img.src = card.querySelector('img')!.src;
+      img.alt = zoom.dataset.mascotName ?? '';
+      caption.textContent = zoom.dataset.mascotName ?? '';
+      dialog.showModal();
+    });
+  });
+  dialog.querySelector('[data-mascot-close]')?.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

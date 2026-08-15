@@ -1,10 +1,10 @@
 # CMS config — shared by Sveltia/Decap
 backend:
   name: github
-  repo: OWNER/detickovo # TODO: set the real GitHub repo
+  repo: stan-jamnicky/detickovo
   branch: main
-  # OAuth proxy Cloudflare Worker, see https://github.com/sveltia/sveltia-cms-auth
-  base_url: https://detickovo-cms-auth.example.workers.dev # TODO: deploy worker and set URL
+  # OAuth proxy for owner's GitHub login without a token, see https://github.com/sveltia/sveltia-cms-auth
+  # base_url: https://YOUR-WORKER.workers.dev # TODO: deploy worker and uncomment
 
 locale: sk
 media_folder: public/uploads
@@ -73,6 +73,16 @@ collections:
     fields:
       - { name: name, label: Meno, widget: string }
       - { name: photo, label: Fotka, widget: image }
+      - name: category
+        label: Kategória
+        widget: select
+        default: ostatni
+        options:
+          - { value: labkova-patrola, label: Labková patrola }
+          - { value: ladove-kralovstvo, label: Ľadové kráľovstvo }
+          - { value: superhrdinovia, label: Superhrdinovia }
+          - { value: disney, label: Disney }
+          - { value: ostatni, label: A ďalší }
       - { name: order, label: Poradie, widget: number, default: 99 }
 
   - name: references
@@ -101,9 +111,10 @@ collections:
           - { name: facebook, label: Facebook URL, widget: string }
           - { name: instagram, label: Instagram URL, widget: string }
           - { name: city, label: Pôsobnosť, widget: string }
+          - { name: founded, label: Dátum založenia, widget: string, hint: "Formát RRRR-MM-DD, z toho sa počítajú roky skúseností" }
           - name: stats
             label: Štatistiky
             widget: list
             fields:
-              - { name: value, label: Hodnota, widget: string }
+              - { name: value, label: Hodnota, widget: string, hint: "Hodnota „auto“ = automaticky vypočítané roky od založenia" }
               - { name: label, label: Popis, widget: string }

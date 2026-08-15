@@ -3,9 +3,9 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Confetti from '../components/Confetti.astro';
 import EventCard from '../components/EventCard.astro';
+import MascotGrid from '../components/MascotGrid.astro';
 import CTASection from '../components/CTASection.astro';
 
-const mascots = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order);
 const events = (await getCollection('events'))
   .filter((e) => e.data.eventType === 'narodeniny')
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
@@ -59,13 +59,8 @@ const included = [
     <div class="container-site">
       <span class="kicker">Naši maskoti</span>
       <h2 class="max-w-xl text-3xl sm:text-4xl">Koho si oslávenec vyberie?</h2>
-      <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {mascots.map((m) => (
-          <div class="overflow-hidden rounded-blob bg-white ring-1 ring-ink/5">
-            <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="aspect-square w-full object-cover" />
-            <p class="p-4 text-center font-display font-bold">{m.data.name}</p>
-          </div>
-        ))}
+      <div class="mt-10">
+        <MascotGrid />
       </div>
     </div>
   </section>

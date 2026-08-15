@@ -1,0 +1,34 @@
+---
+import Base from '../layouts/Base.astro';
+import Confetti from '../components/Confetti.astro';
+import MascotGrid from '../components/MascotGrid.astro';
+import CTASection from '../components/CTASection.astro';
+---
+
+<Base
+  title="Naši maskoti – Detičkovo"
+  description="Spoznajte maskotov Detičkova – Labková patrola, Ľadové kráľovstvo, superhrdinovia, Disney postavičky a ďalší. Vyberte si maskotov na vašu akciu."
+>
+  <section class="relative overflow-hidden bg-cream">
+    <div class="container-site relative py-16 sm:py-20">
+      <Confetti class="absolute right-0 top-2 hidden w-32 md:block lg:w-40" />
+      <span class="kicker">Naši maskoti</span>
+      <h1 class="max-w-2xl text-4xl sm:text-5xl">Koho pošleme na vašu akciu?</h1>
+      <p class="mt-4 max-w-xl text-muted">
+        Vyberte si maskotov, ktorých majú vaše deti najradšej. Ťuknutím ich označíte
+        a rovno naplánujeme akciu aj s nimi.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      <MascotGrid ctaBase="/objednavka" ctaLabel="Naplánovať akciu s maskotmi" />
+    </div>
+  </section>
+
+  <CTASection
+    title="Neviete si vybrať?"
+    text="Napíšte nám, pre koho akciu chystáte, a poradíme vám maskotov, ktorí budú mať najväčší úspech."
+  />
+</Base>

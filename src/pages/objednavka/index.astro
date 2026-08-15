@@ -2,9 +2,19 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { EVENT_TYPES } from '../../lib/eventTypes';
+import site from '../../data/site.json';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const mascots = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order);
 const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? 'REPLACE_WITH_WEB3FORMS_KEY';
+
+const MASCOT_CATEGORIES = [
+  { id: 'labkova-patrola', label: 'Labková patrola' },
+  { id: 'ladove-kralovstvo', label: 'Ľadové kráľovstvo' },
+  { id: 'superhrdinovia', label: 'Superhrdinovia' },
+  { id: 'disney', label: 'Disney' },
+  { id: 'ostatni', label: 'A ďalší' },
+].filter((c) => mascots.some((m) => m.data.category === c.id));
 
 const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '150 – 500 detí', 'viac ako 500 detí'];
 ---
@@ -14,12 +24,36 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   description="Pošlite nám nezáväznú objednávku detského programu. Do 24 hodín sa ozveme s návrhom programu a dostupnosťou termínu."
 >
   <section class="bg-cream">
-    <div class="container-site py-14 sm:py-16">
+    <div class="container-site pb-24 pt-14 sm:pt-16">
       <span class="kicker">Nezáväzná objednávka</span>
       <h1 class="max-w-2xl text-4xl sm:text-5xl">Naplánujme vašu akciu</h1>
       <p class="mt-4 max-w-xl text-muted">Tri krátke kroky. Do 24 hodín dostanete odpoveď s návrhom programu a cenovou ponukou.</p>
     </div>
   </section>
+
+  <!-- Contact boxes straddling the hero edge -->
+  <div class="container-site relative z-10 -mt-12">
+    <div class="grid gap-5 sm:grid-cols-3">
+      <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5 transition-shadow hover:shadow-xl">
+        <p class="text-xs font-bold uppercase tracking-widest text-brand-blue">Telefón</p>
+        <p class="mt-1.5 font-display text-lg font-bold">{site.phoneDisplay}</p>
+        <p class="mt-1 text-sm text-muted">Po–Pia 9:00–17:00</p>
+      </a>
+      <a href={`mailto:${site.email}`} class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5 transition-shadow hover:shadow-xl">
+        <p class="text-xs font-bold uppercase tracking-widest text-brand-green">E-mail</p>
+        <p class="mt-1.5 font-display text-lg font-bold">{site.email}</p>
+        <p class="mt-1 text-sm text-muted">Odpovedáme do 24 hodín</p>
+      </a>
+      <div class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5">
+        <p class="text-xs font-bold uppercase tracking-widest text-brand-magenta">Pôsobnosť</p>
+        <p class="mt-1.5 font-display text-lg font-bold">{site.city}</p>
+        <p class="mt-1 flex gap-3 text-sm font-semibold">
+          <a href={site.facebook} rel="noopener" target="_blank" class="text-brand-blue hover:underline">Facebook</a>
+          <a href={site.instagram} rel="noopener" target="_blank" class="text-brand-blue hover:underline">Instagram</a>
+        </p>
+      </div>
+    </div>
+  </div>
 
   <section class="section">
     <div class="container-site max-w-3xl">
@@ -119,6 +153,31 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
               </label>
             ))}
           </div>
+          <div data-mascot-picker hidden class="mt-8">
+            <p class="font-display text-lg font-bold">Vyberte maskotov <span class="font-sans text-sm font-normal text-muted">(minimálne 2)</span></p>
+            <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter maskotov">
+              <button type="button" class="chip !bg-ink !text-white" data-mascot-filter="all">Všetci</button>
+              {MASCOT_CATEGORIES.map((c) => (
+                <button type="button" class="chip hover:bg-ink/10" data-mascot-filter={c.id}>{c.label}</button>
+              ))}
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {mascots.map((m) => (
+                <label
+                  class="group cursor-pointer overflow-hidden rounded-2xl bg-white ring-2 ring-ink/10 transition has-checked:ring-brand-blue hover:ring-brand-blue/40"
+                  data-mascot-card
+                  data-mascot-category={m.data.category}
+                >
+                  <input type="checkbox" name="Maskoti" value={m.data.name} class="sr-only" data-mascot-check data-mascot-id={m.id} />
+                  <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="aspect-square w-full object-cover" />
+                  <span class="block p-2 text-center text-xs font-semibold transition group-has-checked:bg-brand-blue group-has-checked:text-white">{m.data.name}</span>
+                </label>
+              ))}
+            </div>
+            <p data-mascot-error hidden class="mt-3 rounded-xl bg-brand-red/10 p-3 text-sm font-medium text-brand-red">
+              Vyberte prosím aspoň 2 maskotov.
+            </p>
+          </div>
           <label class="mt-6 block">
             <span class="mb-1.5 block text-sm font-semibold">Iné požiadavky (nepovinné)</span>
             <textarea name="Iné požiadavky" rows="3" placeholder="Čokoľvek, čo by sme mali vedieť…" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none"></textarea>
@@ -198,14 +257,59 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     return [...fields].every((f) => f.reportValidity());
   }
 
+  // Mascot picker: shown when the Maskoti service is checked; requires at least 2 picks
+  const maskotiService = form.querySelector<HTMLInputElement>('input[name="Služby"][value="Maskoti"]');
+  const mascotPicker = form.querySelector<HTMLElement>('[data-mascot-picker]')!;
+  const mascotChecks = [...form.querySelectorAll<HTMLInputElement>('[data-mascot-check]')];
+  const mascotError = form.querySelector<HTMLElement>('[data-mascot-error]')!;
+
+  maskotiService?.addEventListener('change', () => {
+    mascotPicker.hidden = !maskotiService.checked;
+    if (!maskotiService.checked) {
+      mascotChecks.forEach((c) => (c.checked = false));
+      mascotError.hidden = true;
+    }
+  });
+
+  function mascotsValid() {
+    if (!maskotiService?.checked) return true;
+    const ok = mascotChecks.filter((c) => c.checked).length >= 2;
+    mascotError.hidden = ok;
+    if (!ok) mascotPicker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return ok;
+  }
+
+  // Pre-select mascots carried over from the narodeniny page (?maskoti=id1,id2)
+  const mascotParam = new URLSearchParams(location.search).get('maskoti');
+  if (mascotParam && maskotiService) {
+    if (!maskotiService.checked) maskotiService.click();
+    mascotParam.split(',').forEach((id) => {
+      const check = form.querySelector<HTMLInputElement>(`[data-mascot-check][data-mascot-id="${CSS.escape(id)}"]`);
+      if (check) check.checked = true;
+    });
+  }
+
+  const mascotFilters = [...form.querySelectorAll<HTMLButtonElement>('[data-mascot-filter]')];
+  const mascotCards = [...form.querySelectorAll<HTMLElement>('[data-mascot-card]')];
+  mascotFilters.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      mascotFilters.forEach((b) => b.classList.remove('!bg-ink', '!text-white'));
+      btn.classList.add('!bg-ink', '!text-white');
+      const filter = btn.dataset.mascotFilter;
+      mascotCards.forEach((card) => {
+        card.style.display = filter === 'all' || card.dataset.mascotCategory === filter ? '' : 'none';
+      });
+    });
+  });
+
   prevBtn.addEventListener('click', () => show(current - 1));
   nextBtn.addEventListener('click', () => {
-    if (stepValid(current)) show(current + 1);
+    if (stepValid(current) && (current !== 1 || mascotsValid())) show(current + 1);
   });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!stepValid(current)) return;
+    if (!stepValid(current) || !mascotsValid()) return;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Odosielam…';
     errorBox.hidden = true;

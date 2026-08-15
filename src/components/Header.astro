@@ -6,21 +6,15 @@ const nav = [
   { href: '/narodeniny', label: 'Narodeniny' },
   { href: '/svadby', label: 'Svadby' },
   { href: '/akcie', label: 'Naše akcie' },
-  { href: '/kontakt', label: 'Kontakt' },
+  { href: '/maskoti', label: 'Maskoti' },
 ];
 const current = Astro.url.pathname;
 ---
 
 <header class="sticky top-0 z-40 border-b border-ink/5 bg-white/90 backdrop-blur">
   <div class="container-site flex h-16 items-center justify-between gap-4">
-    <a href="/" class="flex items-center gap-2 font-display text-xl font-extrabold tracking-tight">
-      <svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true">
-        <circle cx="7" cy="9" r="4" fill="#00adee" />
-        <circle cx="16" cy="7" r="2.5" fill="#fbb02f" />
-        <circle cx="17" cy="16" r="3.5" fill="#70be44" />
-        <circle cx="8" cy="17" r="2" fill="#ed2d28" />
-      </svg>
-      {site.name}
+    <a href="/" class="flex items-center">
+      <img src="/logo_2026.png" alt="Detičkovo" class="h-7 w-auto" width="615" height="108" />
     </a>
 
     <nav class="hidden items-center gap-6 lg:flex" aria-label="Hlavná navigácia">

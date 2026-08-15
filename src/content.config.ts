@@ -34,6 +34,7 @@ const mascots = defineCollection({
   schema: z.object({
     name: z.string(),
     photo: z.string(),
+    category: z.enum(['labkova-patrola', 'ladove-kralovstvo', 'superhrdinovia', 'disney', 'ostatni']).default('ostatni'),
     order: z.number().default(99),
   }),
 });

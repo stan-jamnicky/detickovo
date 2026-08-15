@@ -1,11 +1,18 @@
 ---
 import site from '../data/site.json';
 
+// "auto" stat values become full years since founding, computed at build time
+const founded = new Date(site.founded);
+const now = new Date();
+let years = now.getFullYear() - founded.getFullYear();
+if (now < new Date(now.getFullYear(), founded.getMonth(), founded.getDate())) years--;
+
+const stats = site.stats.map((s) => (s.value === 'auto' ? { ...s, value: String(years) } : s));
 const colors = ['text-brand-blue', 'text-brand-green', 'text-brand-magenta', 'text-brand-orange'];
 ---
 
 <div class="grid grid-cols-2 gap-8 lg:grid-cols-4">
-  {site.stats.map((stat, i) => (
+  {stats.map((stat, i) => (
     <div class="text-center">
       <p class={`font-display text-4xl font-extrabold sm:text-5xl ${colors[i % colors.length]}`}>{stat.value}</p>
       <p class="mt-2 text-sm font-medium text-muted">{stat.label}</p>
