@@ -14,6 +14,7 @@ export const EVENT_TYPES: EventTypeInfo[] = [
   { id: 'svadba', label: 'Svadba', short: 'Postaráme sa o deti, aby ste si svadbu užili naplno.', href: '/svadby', color: 'var(--color-brand-orange)', icon: '💍' },
   { id: 'narodeniny', label: 'Narodeniny', short: 'Oslava u vás doma, na záhrade či v prenajatom priestore.', href: '/narodeniny', color: 'var(--color-brand-red)', icon: '🎂' },
   { id: 'festival', label: 'Festival', short: 'Detské zóny a program pre festivaly a komunitné akcie.', href: '/velke-akcie', color: 'var(--color-brand-blue)', icon: '🎪' },
+  { id: 'pobytovy-tabor', label: 'Pobytový tábor', short: 'Viacdňové tábory s programom, o ktorý sa postará náš tím.', href: '/pobytove-tabory', color: 'var(--color-brand-green)', icon: '🏕️' },
 ];
 
 export function eventTypeLabel(id: string): string {

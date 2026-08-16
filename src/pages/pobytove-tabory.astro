@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import ServiceGrid from '../components/ServiceGrid.astro';
+import ReferenceRow from '../components/ReferenceRow.astro';
+import CTASection from '../components/CTASection.astro';
+
+const highlights = [
+  { title: 'Program od rána do večera', text: 'Tematické dni, hry, súťaže a tvorivé dielne – deti sa nezastavia a nudiť sa nebudú.', color: 'bg-brand-blue' },
+  { title: 'Skúsení animátori', text: 'Náš tím sa o deti stará počas celého pobytu – s energiou, trpezlivosťou a úsmevom.', color: 'bg-brand-green' },
+  { title: 'Návštevy maskotov', text: 'Obľúbené postavičky prídu deti prekvapiť priamo do tábora.', color: 'bg-brand-magenta' },
+  { title: 'Večerné programy', text: 'Diskotéky, karneval, talentová šou či nočná hra – zážitky, na ktoré sa nezabúda.', color: 'bg-brand-orange' },
+];
+
+const steps = [
+  { n: '1', title: 'Pošlete nám nezáväznú objednávku', text: 'Napíšete nám termín, miesto pobytu a približný počet detí.' },
+  { n: '2', title: 'Navrhneme program', text: 'Do 24 hodín sa ozveme s návrhom táborového programu a cenovou ponukou.' },
+  { n: '3', title: 'Doladíme detaily', text: 'Spoločne upravíme témy dní, harmonogram a špeciálne požiadavky.' },
+  { n: '4', title: 'Prídeme a zabavíme', text: 'Počas tábora sa o zábavu stará náš tím. Vy sa už o nič nestaráte.' },
+];
+---
+
+<Base
+  title="Pobytové tábory s programom – Detičkovo"
+  description="Viacdňové pobytové tábory s kompletným programom – animátori, maskoti, tematické dni a večerné aktivity. Pre školy, mestá, CVČ aj firmy po celom Slovensku."
+>
+  <section class="bg-cream">
+    <div class="container-site py-16 sm:py-24">
+      <span class="kicker">Pobytové tábory</span>
+      <h1 class="max-w-3xl text-4xl sm:text-6xl">Tábor plný zážitkov? Zariadime.</h1>
+      <p class="mt-5 max-w-2xl text-lg text-muted">
+        Viacdňové pobytové tábory s kompletným programom v našej réžii. Animátori, maskoti,
+        tematické dni aj večerné aktivity – pre školy, mestá, CVČ aj firmy po celom Slovensku.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
+        <a href="#program" class="btn-secondary">Čo deti čaká</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="program" class="section">
+    <div class="container-site">
+      <span class="kicker">Čo deti čaká</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Zábava na každý deň pobytu</h2>
+      <div class="mt-10 grid gap-5 sm:grid-cols-2">
+        {highlights.map((h) => (
+          <div class="rounded-blob bg-white p-7 ring-1 ring-ink/5">
+            <span class={`mb-4 block h-2.5 w-10 rounded-full ${h.color}`}></span>
+            <h3 class="text-xl">{h.title}</h3>
+            <p class="mt-2 text-muted">{h.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-cream">
+    <div class="container-site">
+      <span class="kicker">Služby</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Z čoho poskladáme táborový program</h2>
+      <div class="mt-10">
+        <ServiceGrid />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      <span class="kicker">Ako to prebieha</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Spolupráca v štyroch krokoch</h2>
+      <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((step) => (
+          <div>
+            <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-blue font-display text-lg font-bold text-white">{step.n}</span>
+            <h3 class="mt-4 text-lg">{step.title}</h3>
+            <p class="mt-1.5 text-sm text-muted">{step.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-cream">
+    <div class="container-site">
+      <span class="kicker">Referencie</span>
+      <h2 class="max-w-xl text-3xl sm:text-4xl">Dôverujú nám</h2>
+      <div class="mt-10">
+        <ReferenceRow />
+      </div>
+    </div>
+  </section>
+
+  <CTASection
+    title="Plánujete pobytový tábor?"
+    text="Pošlite nám termín a počet detí. Do 24 hodín dostanete návrh programu aj cenovú ponuku."
+  />
+</Base>

@@ -27,7 +27,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   <section class="bg-cream">
     <div class="container-site pb-24 pt-14 sm:pt-16">
       <span class="kicker">Nezáväzná objednávka</span>
-      <h1 class="max-w-2xl text-4xl sm:text-5xl">Naplánujme vašu akciu</h1>
+      <h1 class="max-w-2xl text-4xl sm:text-6xl">Naplánujme vašu akciu</h1>
       <p class="mt-4 max-w-xl text-muted">Tri krátke kroky. Do 24 hodín dostanete odpoveď s návrhom programu a cenovou ponukou.</p>
     </div>
   </section>
@@ -121,12 +121,16 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                   aria-autocomplete="list"
                   class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none"
                 />
+                <span
+                  id="miesto-spin"
+                  class="pointer-events-none absolute right-3.5 top-1/2 hidden h-5 w-5 -translate-y-1/2 animate-spin rounded-full border-2 border-ink/15 border-t-brand-blue"
+                  aria-hidden="true"
+                ></span>
                 <ul
                   id="miesto-list"
-                  hidden
                   role="listbox"
                   aria-label="Návrhy adries"
-                  class="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-ink/10 bg-white py-1 shadow-lg shadow-ink/10"
+                  class="invisible absolute z-10 mt-1 max-h-64 w-full -translate-y-1 overflow-auto rounded-xl border border-ink/10 bg-white py-1 opacity-0 shadow-lg shadow-ink/10 transition-all duration-150 ease-out"
                 ></ul>
               </div>
             </label>
@@ -148,6 +152,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 <input type="checkbox" name="Služby" value={s.data.title} class="sr-only" />
                 <span class="text-4xl" aria-hidden="true">{s.data.icon}</span>
                 <span class="text-sm font-semibold">{s.data.title}</span>
+                <span class="text-xs leading-snug opacity-70">{s.data.description}</span>
               </label>
             ))}
           </div>
@@ -331,19 +336,27 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   // Address autocomplete via Photon (OpenStreetMap), biased to Slovakia's bounding box
   const input = document.getElementById('miesto') as HTMLInputElement;
   const list = document.getElementById('miesto-list') as HTMLUListElement;
+  const spin = document.getElementById('miesto-spin') as HTMLElement;
   let timer: number | undefined;
   let active = -1;
+  let ctrl: AbortController | null = null;
+  let seq = 0;
+  const cache = new Map<string, string[]>();
 
-  const hide = () => {
-    list.hidden = true;
-    list.innerHTML = '';
-    input.setAttribute('aria-expanded', 'false');
-    active = -1;
+  const setOpen = (open: boolean) => {
+    list.classList.toggle('invisible', !open);
+    list.classList.toggle('opacity-0', !open);
+    list.classList.toggle('-translate-y-1', !open);
+    input.setAttribute('aria-expanded', String(open));
+    if (!open) {
+      active = -1;
+      input.removeAttribute('aria-activedescendant');
+    }
   };
 
   const pick = (label: string) => {
     input.value = label;
-    hide();
+    setOpen(false);
   };
 
   const highlight = (i: number) => {
@@ -351,18 +364,56 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     if (!items.length) return;
     active = (i + items.length) % items.length;
     items.forEach((el, idx) => el.classList.toggle('bg-cream', idx === active));
+    items[active].scrollIntoView({ block: 'nearest' });
+    input.setAttribute('aria-activedescendant', items[active].id);
+  };
+
+  // Rebuilds options in place; previous results stay visible while a fetch is pending
+  const render = (labels: string[], q: string) => {
+    list.innerHTML = '';
+    labels.forEach((label, idx) => {
+      const li = document.createElement('li');
+      li.id = `miesto-opt-${idx}`;
+      li.setAttribute('role', 'option');
+      li.className = 'cursor-pointer px-4 py-2.5 text-sm hover:bg-cream';
+      const at = label.toLowerCase().indexOf(q.toLowerCase());
+      if (at >= 0) {
+        const strong = document.createElement('strong');
+        strong.textContent = label.slice(at, at + q.length);
+        li.append(label.slice(0, at), strong, label.slice(at + q.length));
+      } else {
+        li.textContent = label;
+      }
+      li.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        pick(label);
+      });
+      list.appendChild(li);
+    });
+    setOpen(labels.length > 0);
   };
 
   input.addEventListener('input', () => {
     clearTimeout(timer);
     const q = input.value.trim();
-    if (q.length < 3) return hide();
+    if (q.length < 3) {
+      ctrl?.abort();
+      spin.classList.add('hidden');
+      return setOpen(false);
+    }
+    const cached = cache.get(q);
+    if (cached) return render(cached, q);
     timer = window.setTimeout(async () => {
+      ctrl?.abort();
+      ctrl = new AbortController();
+      const mySeq = ++seq;
+      spin.classList.remove('hidden');
       try {
         const res = await fetch(
-          `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5&bbox=16.8,47.7,22.6,49.7`
+          `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5&bbox=16.8,47.7,22.6,49.7`,
+          { signal: ctrl.signal }
         );
-        if (!res.ok) return hide();
+        if (!res.ok || mySeq !== seq) return;
         const data = await res.json();
         const labels: string[] = [
           ...new Set<string>(
@@ -373,45 +424,34 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
             })
           ),
         ];
-        if (!labels.length) return hide();
-        list.innerHTML = '';
-        labels.forEach((label) => {
-          const li = document.createElement('li');
-          li.textContent = label;
-          li.setAttribute('role', 'option');
-          li.className = 'cursor-pointer px-4 py-2.5 text-sm hover:bg-cream';
-          li.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            pick(label);
-          });
-          list.appendChild(li);
-        });
-        list.hidden = false;
-        input.setAttribute('aria-expanded', 'true');
-        active = -1;
+        cache.set(q, labels);
+        if (mySeq === seq && input.value.trim() === q) render(labels, q);
       } catch {
-        hide();
+        /* aborted or offline – keep whatever is shown */
+      } finally {
+        if (mySeq === seq) spin.classList.add('hidden');
       }
-    }, 300);
+    }, 250);
   });
 
   input.addEventListener('keydown', (e) => {
-    if (list.hidden) return;
+    if (list.classList.contains('invisible')) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       highlight(active + 1);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       highlight(active - 1);
-    } else if (e.key === 'Enter' && active >= 0) {
+    } else if (e.key === 'Enter') {
       e.preventDefault();
-      pick((list.children[active] as HTMLElement).textContent ?? '');
+      const item = list.children[active >= 0 ? active : 0] as HTMLElement | undefined;
+      if (item) pick(item.textContent ?? '');
     } else if (e.key === 'Escape') {
-      hide();
+      setOpen(false);
     }
   });
 
-  input.addEventListener('blur', () => setTimeout(hide, 150));
+  input.addEventListener('blur', () => setTimeout(() => setOpen(false), 150));
 </script>
 
 <script>

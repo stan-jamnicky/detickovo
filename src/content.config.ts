@@ -1,7 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-const eventTypes = z.enum(['mesto-obec', 'skola-skolka', 'firma', 'svadba', 'narodeniny', 'festival']);
+const eventTypes = z.enum(['mesto-obec', 'skola-skolka', 'firma', 'svadba', 'narodeniny', 'festival', 'pobytovy-tabor']);
 
 const events = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/events' }),

@@ -34,6 +34,7 @@ collections:
           - { value: svadba, label: Svadba }
           - { value: narodeniny, label: Narodeniny }
           - { value: festival, label: Festival }
+          - { value: pobytovy-tabor, label: Pobytový tábor }
       - name: services
         label: Použité služby
         widget: relation
