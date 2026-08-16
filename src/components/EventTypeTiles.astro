@@ -2,7 +2,7 @@
 import { EVENT_TYPES } from '../lib/eventTypes';
 ---
 
-<div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
   {EVENT_TYPES.map((type) => (
     <a
       href={type.href}
@@ -18,4 +18,17 @@ import { EVENT_TYPES } from '../lib/eventTypes';
       <span class="mt-3 inline-block text-sm font-semibold text-brand-blue">Zistiť viac →</span>
     </a>
   ))}
+  <a
+    href="/objednavka"
+    class="group relative overflow-hidden rounded-blob bg-white p-6 ring-1 ring-ink/5 transition-shadow hover:shadow-lg hover:shadow-ink/10"
+  >
+    <span
+      class="absolute -right-4 -top-4 h-16 w-16 rounded-full opacity-15 transition-transform group-hover:scale-125"
+      style="background:var(--color-brand-yellow)"
+    ></span>
+    <span class="mb-2 block text-2xl" aria-hidden="true">✨</span>
+    <h3 class="text-lg">Iná akcia</h3>
+    <p class="mt-1.5 hidden text-sm text-muted sm:block">Nenašli ste tú svoju? Vymyslíme program na mieru.</p>
+    <span class="mt-3 inline-block text-sm font-semibold text-brand-blue">Napísať nám →</span>
+  </a>
 </div>

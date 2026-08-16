@@ -80,7 +80,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
 
         <fieldset data-step="1">
           <legend class="mb-6 font-display text-2xl font-bold">Čo pripravujete?</legend>
-          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Typ akcie">
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="radiogroup" aria-label="Typ akcie">
             {EVENT_TYPES.map((type) => (
               <label class="flex cursor-pointer flex-col items-center gap-2 rounded-2xl bg-cream p-5 text-center ring-2 ring-transparent transition has-checked:bg-brand-blue has-checked:text-white has-focus-visible:ring-ink/40 hover:ring-brand-blue/40">
                 <input type="radio" name="Typ akcie" value={type.label} data-type-id={type.id} required class="sr-only" />
@@ -88,7 +88,22 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 <span class="text-sm font-semibold">{type.label}</span>
               </label>
             ))}
+            <label class="flex cursor-pointer flex-col items-center gap-2 rounded-2xl bg-cream p-5 text-center ring-2 ring-transparent transition has-checked:bg-brand-blue has-checked:text-white has-focus-visible:ring-ink/40 hover:ring-brand-blue/40">
+              <input type="radio" name="Typ akcie" value="Iná akcia" data-type-id="ina-akcia" required class="sr-only" />
+              <span class="text-4xl" aria-hidden="true">✨</span>
+              <span class="text-sm font-semibold">Iná akcia</span>
+            </label>
           </div>
+          <label id="ina-akcia-wrap" hidden class="mt-5 block">
+            <span class="mb-1.5 block text-sm font-semibold">Aká akcia to bude?</span>
+            <input
+              type="text"
+              name="Popis inej akcie"
+              id="ina-akcia-popis"
+              placeholder="napr. oslava výročia, komunitné podujatie, otvorenie predajne…"
+              class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none"
+            />
+          </label>
           <div class="mt-6 grid gap-5 sm:grid-cols-2">
             <label class="block">
               <span class="mb-1.5 block text-sm font-semibold">Dátum akcie</span>
@@ -100,6 +115,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 placeholder="Vyberte dátum…"
                 class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none"
               />
+              <span class="mt-1.5 block text-xs text-muted">Rezervácia termínu je možná minimálne 7 dní pred akciou.</span>
             </label>
             <label class="block">
               <span class="mb-1.5 block text-sm font-semibold">Čas (približne)</span>
@@ -244,6 +260,21 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   if (typ) {
     form.querySelector<HTMLInputElement>(`input[data-type-id="${typ}"]`)?.click();
   }
+
+  // "Iná akcia" reveals a brief description field
+  const inaWrap = document.getElementById('ina-akcia-wrap') as HTMLElement;
+  const inaInput = document.getElementById('ina-akcia-popis') as HTMLInputElement;
+  const syncInaAkcia = () => {
+    const checked = form.querySelector<HTMLInputElement>('input[name="Typ akcie"]:checked');
+    const isIna = checked?.dataset.typeId === 'ina-akcia';
+    inaWrap.hidden = !isIna;
+    inaInput.required = isIna;
+    if (!isIna) inaInput.value = '';
+  };
+  form.querySelectorAll<HTMLInputElement>('input[name="Typ akcie"]').forEach((r) =>
+    r.addEventListener('change', syncInaAkcia)
+  );
+  syncInaAkcia();
 
   function show(i: number) {
     current = i;
@@ -460,7 +491,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
 
   flatpickr('#datum', {
     locale: Slovak,
-    minDate: 'today',
+    minDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     dateFormat: 'd.m.Y',
     disableMobile: false,
   });
