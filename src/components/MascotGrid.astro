@@ -63,8 +63,8 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
 
 <!-- Floating selection banner -->
 <div class="fixed inset-x-0 bottom-4 z-40 hidden px-4" data-mascot-cta aria-live="polite">
-  <div class="mx-auto flex w-fit max-w-full items-center gap-3 rounded-full bg-white py-2 pl-3 pr-2 shadow-2xl shadow-ink/25 ring-1 ring-ink/10">
-    <div class="flex shrink-0 -space-x-2" data-mascot-avatars></div>
+  <div class="mx-auto flex w-fit max-w-full flex-col items-center gap-2 rounded-3xl bg-white p-2 shadow-2xl shadow-ink/25 ring-1 ring-ink/10 sm:flex-row sm:gap-3 sm:rounded-full sm:py-2 sm:pl-3 sm:pr-2">
+    <div class="flex max-w-full flex-wrap justify-center -space-x-2 sm:shrink-0 sm:flex-nowrap" data-mascot-avatars></div>
     <p class="hidden whitespace-nowrap font-display text-sm font-bold sm:block"><span data-mascot-count>0</span> vybraných</p>
     <a href={ctaBase} data-mascot-link data-cta-base={ctaBase} class="btn-primary !px-5 !py-2.5 text-sm whitespace-nowrap">{ctaLabel}</a>
   </div>

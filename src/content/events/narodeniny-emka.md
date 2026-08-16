@@ -13,4 +13,4 @@ testimonial:
   author: Mamina Zuzana
 ---
 
-Dvojhodinová oslava na záhrade rodinného domu. Jednorožec Lila, animátorka s hrami a súťažami, modelovanie balónikov a maľovanie na tvár pre všetkých malých hostí.
+Dvojhodinová oslava na záhrade rodinného domu. Jednorožec Lila, animátorka s hrami a súťažami a maľovanie na tvár pre všetkých malých hostí.

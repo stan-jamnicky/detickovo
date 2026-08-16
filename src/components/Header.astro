@@ -11,7 +11,7 @@ const nav = [
 const current = Astro.url.pathname;
 ---
 
-<header class="sticky top-0 z-40 border-b border-ink/5 bg-white/90 backdrop-blur">
+<header id="site-header" class="sticky top-0 z-40 border-b border-transparent bg-cream backdrop-blur transition-colors duration-300">
   <div class="container-site flex h-16 items-center justify-between gap-4">
     <a href="/" class="flex items-center">
       <img src="/logo_2026.png" alt="Detičkovo" class="h-7 w-auto" width="615" height="108" />
@@ -44,22 +44,70 @@ const current = Astro.url.pathname;
       </svg>
     </button>
   </div>
-
-  <div id="mobile-menu" class="hidden border-t border-ink/5 bg-white lg:hidden">
-    <nav class="container-site flex flex-col gap-1 py-4" aria-label="Mobilná navigácia">
-      {nav.map((item) => (
-        <a href={item.href} class="rounded-xl px-3 py-3 font-medium hover:bg-sand">{item.label}</a>
-      ))}
-      <a href="/objednavka" class="btn-primary mt-2">Naplánovať akciu</a>
-    </nav>
-  </div>
 </header>
+
+<div id="mobile-menu" class="invisible fixed inset-0 z-50 flex flex-col bg-cream opacity-0 transition-all duration-300 lg:hidden">
+  <div class="container-site flex h-16 shrink-0 items-center justify-between">
+    <a href="/" class="flex items-center">
+      <img src="/logo_2026.png" alt="Detičkovo" class="h-7 w-auto" width="615" height="108" />
+    </a>
+    <button
+      id="menu-close"
+      class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-sm"
+      aria-label="Zavrieť menu"
+    >
+      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
+  </div>
+  <nav
+    id="mobile-menu-nav"
+    class="container-site flex flex-1 translate-y-4 flex-col justify-center transition-transform duration-300"
+    aria-label="Mobilná navigácia"
+  >
+    {nav.map((item, i) => (
+      <a
+        href={item.href}
+        class:list={[
+          'flex items-center justify-between border-b border-ink/5 py-4 font-display text-3xl font-bold',
+          current.startsWith(item.href) ? 'text-brand-blue' : 'text-ink',
+        ]}
+      >
+        {item.label}
+        <span class={['text-brand-blue', 'text-brand-green', 'text-brand-magenta', 'text-brand-orange', 'text-brand-red'][i % 5]} aria-hidden="true">→</span>
+      </a>
+    ))}
+  </nav>
+  <div class="container-site shrink-0 pb-10">
+    <a href="/objednavka" class="btn-primary w-full">Naplánovať akciu</a>
+  </div>
+</div>
 
 <script>
   const toggle = document.getElementById('menu-toggle');
   const menu = document.getElementById('mobile-menu');
-  toggle?.addEventListener('click', () => {
-    const open = menu?.classList.toggle('hidden') === false;
-    toggle.setAttribute('aria-expanded', String(open));
-  });
+  const menuNav = document.getElementById('mobile-menu-nav');
+  const close = document.getElementById('menu-close');
+
+  const setMenu = (open: boolean) => {
+    menu?.classList.toggle('invisible', !open);
+    menu?.classList.toggle('opacity-0', !open);
+    menuNav?.classList.toggle('translate-y-4', !open);
+    document.body.classList.toggle('overflow-hidden', open);
+    toggle?.setAttribute('aria-expanded', String(open));
+  };
+  toggle?.addEventListener('click', () => setMenu(true));
+  close?.addEventListener('click', () => setMenu(false));
+
+  const header = document.getElementById('site-header');
+  const onScroll = () => {
+    const scrolled = window.scrollY > 4;
+    header?.classList.toggle('bg-cream', !scrolled);
+    header?.classList.toggle('border-transparent', !scrolled);
+    header?.classList.toggle('bg-white/90', scrolled);
+    header?.classList.toggle('border-ink/5', scrolled);
+  };
+  onScroll();
+  document.addEventListener('scroll', onScroll, { passive: true });
 </script>

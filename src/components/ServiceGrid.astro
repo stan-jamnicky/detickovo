@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 ---
 
-<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
   {services.map((s) => (
     <div class="rounded-blob bg-cream p-6">
       <span class="text-3xl" aria-hidden="true">{s.data.icon}</span>

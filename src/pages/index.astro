@@ -20,33 +20,40 @@ const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.orde
   description="Zábavu na vašu akciu prinesieme my. Maskoti, animátori a kompletný detský program pre mestá, školy, firmy, svadby aj narodeninové oslavy po celom Slovensku."
 >
   <!-- Hero -->
-  <section class="relative overflow-hidden bg-cream">
-    <div class="container-site grid items-center gap-10 py-16 sm:py-24 lg:grid-cols-2">
-      <div class="relative">
-        <Confetti class="absolute -top-14 left-0 hidden w-28 sm:block md:-top-16 md:w-32" />
-        <h1 class="text-4xl sm:text-6xl">Zábavu na vašu akciu prinesieme my.</h1>
-        <p class="mt-5 max-w-lg text-lg text-muted">
-          Maskoti, animátori a kompletný detský program pre mestá, školy, firmy, svadby aj oslavy.
-          Vy organizujete, my zabávame.
-        </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href="/objednavka" class="btn-primary">Naplánovať akciu</a>
-          <a href="/akcie" class="btn-secondary">Pozrieť naše akcie</a>
+  <section class="overflow-hidden bg-cream">
+    <div class="relative mx-auto max-w-[100rem]">
+      <img
+        src="/hero_image_3_faded.png"
+        alt=""
+        aria-hidden="true"
+        width="3344"
+        height="1882"
+        class="absolute top-1/2 hidden w-[55%] -translate-y-1/2 md:right-0 md:block lg:-right-[15%] lg:w-[75%]"
+        fetchpriority="high"
+      />
+      <div class="container-site relative flex items-center pt-14 pb-0 sm:pt-16 md:min-h-[34rem] md:py-16 lg:min-h-[42rem] lg:py-20">
+        <div class="relative mx-auto max-w-xl text-center md:mx-0 md:text-left">
+          <Confetti class="absolute -top-10 left-1/2 w-20 -translate-x-1/2 sm:w-28 md:-top-16 md:left-0 md:w-32 md:translate-x-0" />
+          <h1 class="text-4xl sm:text-6xl">Zábavu na vašu akciu prinesieme my.</h1>
+          <p class="mx-auto mt-5 max-w-lg text-lg text-muted md:mx-0">
+            Maskoti, animátori a kompletný detský program pre mestá, školy, firmy, svadby aj oslavy.
+            Vy organizujete, my zabávame.
+          </p>
+          <div class="mt-8 flex flex-wrap justify-center gap-3 md:justify-start">
+            <a href="/objednavka" class="btn-primary">Naplánovať akciu</a>
+            <a href="/akcie" class="btn-secondary">Pozrieť naše akcie</a>
+          </div>
         </div>
       </div>
-      <div class="relative">
-        <img
-          src="/uploads/hero.svg"
-          alt="Deti na akcii s animátormi Detičkova"
-          width="1200"
-          height="800"
-          class="rounded-blob object-cover shadow-2xl shadow-ink/10"
-          fetchpriority="high"
-        />
-        <span class="absolute -bottom-4 -left-4 h-10 w-10 rounded-full bg-brand-orange" aria-hidden="true"></span>
-        <span class="absolute -top-4 -right-3 h-7 w-7 rounded-full bg-brand-green" aria-hidden="true"></span>
-      </div>
     </div>
+    <img
+      src="/hero_image_3_faded.png"
+      alt="Deti na akcii s animátormi a maskotmi Detičkova"
+      width="3344"
+      height="1882"
+      class="relative -mb-[5%] -ml-[12.5%] w-[125%] max-w-none md:hidden"
+      fetchpriority="high"
+    />
   </section>
 
   <!-- Event type picker -->
@@ -66,25 +73,34 @@ const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.orde
       <div>
         <span class="kicker">Naša špecialita</span>
         <h2 class="text-3xl sm:text-4xl">Veľké akcie pre stovky detí</h2>
+        <img
+          src="/uploads/event-festival.svg"
+          alt="Detská zóna na mestskom festivale"
+          width="1200"
+          height="800"
+          loading="lazy"
+          class="mt-6 rounded-blob object-cover lg:hidden"
+        />
         <p class="mt-4 text-muted">
           Dni detí, mestské festivaly, školské podujatia či firemné rodinné dni – zvládame akcie
           pre desiatky aj stovky detí. Prídeme s vlastným tímom, technikou a programom na mieru,
           vy sa staráte len o zvyšok podujatia.
         </p>
-        <ul class="mt-6 space-y-3 text-ink">
-          <li class="flex items-start gap-3"><span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-blue"></span>Program na mieru podľa veku a počtu detí</li>
-          <li class="flex items-start gap-3"><span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-green"></span>Vlastný tím maskotov a animátorov</li>
-          <li class="flex items-start gap-3"><span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-brand-magenta"></span>Ozvučenie a moderovanie v cene</li>
+        <ul class="mt-6 flex flex-wrap gap-2.5">
+          <li class="flex items-center gap-2 rounded-full bg-white px-4 py-2 font-display text-sm font-bold shadow-sm"><span class="text-brand-blue" aria-hidden="true">✓</span>Program na mieru podľa veku a počtu detí</li>
+          <li class="flex items-center gap-2 rounded-full bg-white px-4 py-2 font-display text-sm font-bold shadow-sm"><span class="text-brand-green" aria-hidden="true">✓</span>Vlastný tím maskotov a animátorov</li>
+          <li class="flex items-center gap-2 rounded-full bg-white px-4 py-2 font-display text-sm font-bold shadow-sm"><span class="text-brand-magenta" aria-hidden="true">✓</span>Ozvučenie a moderovanie v cene</li>
         </ul>
         <a href="/velke-akcie" class="btn-primary mt-8">Viac o veľkých akciách</a>
       </div>
       <img
         src="/uploads/event-festival.svg"
-        alt="Detská zóna na mestskom festivale"
+        alt=""
+        aria-hidden="true"
         width="1200"
         height="800"
         loading="lazy"
-        class="rounded-blob object-cover"
+        class="hidden rounded-blob object-cover lg:block"
       />
     </div>
   </section>
@@ -98,8 +114,8 @@ const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.orde
         <ServiceGrid />
       </div>
       <div class="mt-12 flex flex-col items-center gap-5 rounded-blob bg-cream p-8 sm:flex-row sm:justify-between">
-        <div class="flex items-center gap-4">
-          <div class="flex -space-x-3">
+        <div class="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+          <div class="flex shrink-0 -space-x-3">
             {mascotTeaser.map((m) => (
               <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="h-12 w-12 rounded-full border-2 border-white object-cover" />
             ))}
