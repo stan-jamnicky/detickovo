@@ -12,7 +12,7 @@ const nav = [
 const current = Astro.url.pathname;
 ---
 
-<header id="site-header" class="sticky top-0 z-40 border-b border-transparent bg-cream backdrop-blur transition-colors duration-300">
+<header id="site-header" class="sticky top-0 z-40 border-b backdrop-blur transition-colors duration-300">
   <div class="container-site flex h-16 items-center justify-between gap-4">
     <a href="/" class="flex items-center">
       <img src="/logo_2026.png" alt="Detičkovo" class="h-7 w-auto" width="615" height="108" />
@@ -103,11 +103,7 @@ const current = Astro.url.pathname;
 
   const header = document.getElementById('site-header');
   const onScroll = () => {
-    const scrolled = window.scrollY > 4;
-    header?.classList.toggle('bg-cream', !scrolled);
-    header?.classList.toggle('border-transparent', !scrolled);
-    header?.classList.toggle('bg-white/90', scrolled);
-    header?.classList.toggle('border-ink/5', scrolled);
+    header?.toggleAttribute('data-scrolled', window.scrollY > 4);
   };
   onScroll();
   document.addEventListener('scroll', onScroll, { passive: true });
