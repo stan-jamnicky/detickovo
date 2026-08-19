@@ -12,9 +12,21 @@
   "city": "Košice a okolie · pôsobíme po celom Slovensku",
   "founded": "2017-05-01",
   "stats": [
-    { "value": "200+", "label": "zrealizovaných akcií" },
-    { "value": "15 000+", "label": "zabavených detí" },
-    { "value": "auto", "label": "rokov skúseností" },
-    { "value": "20+", "label": "maskotov" }
+    {
+      "value": "200+",
+      "label": "zrealizovaných akcií"
+    },
+    {
+      "value": "15 000+",
+      "label": "zabavených detí"
+    },
+    {
+      "value": "auto",
+      "label": "rokov skúseností"
+    },
+    {
+      "value": "20+",
+      "label": "maskotov"
+    }
   ]
 }
