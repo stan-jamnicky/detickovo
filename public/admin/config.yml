@@ -29,7 +29,7 @@ collections:
         widget: select
         options:
           - { value: mesto-obec, label: Mesto / Obec }
-          - { value: skola-skolka, label: Škola / Škôlka }
+          - { value: skola-skolka, label: Zaklandá Škola / Materská Škola }
           - { value: firma, label: Firma }
           - { value: svadba, label: Svadba }
           - { value: narodeniny, label: Narodeniny }
@@ -105,10 +105,13 @@ collections:
         file: src/data/site.json
         fields:
           - { name: name, label: Názov, widget: string }
+          - { name: maintenance, label: Režim údržby, widget: boolean, default: false, hint: "Zapne stránku „Prepáčte, máme prestávku“ pre návštevníkov. Ako admin uvidíte web cez /udrzba?nahlad=1" }
           - { name: tagline, label: Slogan, widget: string }
           - { name: email, label: E-mail, widget: string }
           - { name: phone, label: Telefón (medzinárodný), widget: string }
           - { name: phoneDisplay, label: Telefón (zobrazenie), widget: string }
+          - { name: phone2, label: Telefón 2 (medzinárodný), widget: string }
+          - { name: phone2Display, label: Telefón 2 (zobrazenie), widget: string }
           - { name: facebook, label: Facebook URL, widget: string }
           - { name: instagram, label: Instagram URL, widget: string }
           - { name: city, label: Pôsobnosť, widget: string }

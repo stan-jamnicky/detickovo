@@ -13,4 +13,4 @@ testimonial:
   author: Referát kultúry, Mesto Košice
 ---
 
-Celopoludňajší program ku Dňu detí pre viac ako 350 detí. Štyri maskoty, tri animátorské stanovištia, súťaže s odmenami, obrovské bubliny a maľovanie na tvár bez prestávky. Celý program sme moderovali a ozvučili vlastnou technikou.
+Celopoludňajší program ku Dňu detí pre viac ako 350 detí. Štyria maskoti, tri animátorské stanovištia, súťaže s odmenami, obrovské bubliny a maľovanie na tvár bez prestávky. Celý program sme moderovali a ozvučili vlastnou technikou.

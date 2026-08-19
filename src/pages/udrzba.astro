@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+import site from '../data/site.json';
+
+const maintenance = site.maintenance ?? false;
+---
+
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prepáčte, máme prestávku – {site.name}</title>
+    <meta name="description" content="Web je momentálne v údržbe. Čoskoro sme späť!" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/png" href="/fav_icon.png" />
+    <script is:inline define:vars={{ maintenance }}>
+      // ?nahlad=1 lets the admin browse the live site, ?nahlad=0 turns it off again
+      var nahlad = new URLSearchParams(location.search).get('nahlad');
+      try {
+        if (nahlad === '1') localStorage.setItem('detickovo-nahlad', '1');
+        if (nahlad === '0') localStorage.removeItem('detickovo-nahlad');
+      } catch (e) {}
+      if (nahlad === '1' || !maintenance) location.replace('/');
+    </script>
+  </head>
+  <body class="flex min-h-screen flex-col items-center justify-center bg-cream px-5 text-center">
+    <main>
+      <p class="text-7xl" aria-hidden="true">🎪</p>
+      <h1 class="mt-6 text-3xl sm:text-4xl">Prepáčte, máme prestávku</h1>
+      <p class="mx-auto mt-4 max-w-md text-muted">
+        Na webe {site.name} práve pracujeme. Čoskoro sme späť – zatiaľ nás zastihnete telefonicky alebo e‑mailom.
+      </p>
+      <div class="mt-8 flex flex-col items-center gap-2 font-display font-semibold">
+        <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="text-brand-blue hover:text-brand-blue-dark">{site.phoneDisplay}</a>
+        <a href={`mailto:${site.email}`} class="text-brand-blue hover:text-brand-blue-dark">{site.email}</a>
+      </div>
+    </main>
+  </body>
+</html>

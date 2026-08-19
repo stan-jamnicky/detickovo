@@ -2,12 +2,10 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { EVENT_TYPES } from '../../lib/eventTypes';
-import SocialIcons from '../../components/SocialIcons.astro';
 import site from '../../data/site.json';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const mascots = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order);
-const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? 'REPLACE_WITH_WEB3FORMS_KEY';
 
 const MASCOT_CATEGORIES = [
   { id: 'labkova-patrola', label: 'Labková patrola' },
@@ -35,20 +33,35 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   <!-- Contact boxes straddling the hero edge -->
   <div class="container-site relative z-10 -mt-12">
     <div class="grid gap-5 sm:grid-cols-3">
-      <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5 transition-shadow hover:shadow-xl">
+      <div class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5 transition-shadow hover:shadow-xl">
         <p class="text-xs font-bold uppercase tracking-widest text-brand-blue">Telefón</p>
-        <p class="mt-1.5 font-display text-lg font-bold">{site.phoneDisplay}</p>
+        <p class="mt-1.5 font-display text-lg font-bold"><a href={`tel:${site.phone.replace(/\s/g, '')}`} class="hover:text-brand-blue">{site.phoneDisplay}</a> / <a href={`tel:${site.phone2.replace(/\s/g, '')}`} class="hover:text-brand-blue">{site.phone2Display}</a></p>
         <p class="mt-1 text-sm text-muted">Po–Pia 9:00–17:00</p>
-      </a>
+      </div>
       <a href={`mailto:${site.email}`} class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5 transition-shadow hover:shadow-xl">
         <p class="text-xs font-bold uppercase tracking-widest text-brand-green">E-mail</p>
         <p class="mt-1.5 font-display text-lg font-bold">{site.email}</p>
         <p class="mt-1 text-sm text-muted">Odpovedáme do 24 hodín</p>
       </a>
       <div class="rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5">
-        <p class="text-xs font-bold uppercase tracking-widest text-brand-magenta">Pôsobnosť</p>
-        <p class="mt-1.5 font-display text-lg font-bold">{site.city}</p>
-        <SocialIcons class="mt-2 text-brand-blue" />
+        <p class="text-xs font-bold uppercase tracking-widest text-brand-magenta">Sledujte nás</p>
+        <div class="mt-2.5 flex flex-wrap gap-2">
+          <a href={site.facebook} rel="noopener" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-cream px-4 py-2 font-display text-sm font-semibold transition-colors hover:bg-brand-blue hover:text-white">
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor" aria-hidden="true">
+              <path d="M13.4 21v-7.1h2.4l.45-2.95H13.4V9.03c0-.86.3-1.53 1.62-1.53h1.35V4.86c-.3-.04-1.3-.13-2.44-.13-2.42 0-4.03 1.48-4.03 4.15v2.07H7.5v2.95h2.4V21h3.5Z" />
+            </svg>
+            Facebook
+          </a>
+          <a href={site.instagram} rel="noopener" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-cream px-4 py-2 font-display text-sm font-semibold transition-colors hover:bg-brand-magenta hover:text-white">
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
+            </svg>
+            Instagram
+          </a>
+        </div>
+        <p class="mt-2 text-sm text-muted">{site.city}</p>
       </div>
     </div>
   </div>
@@ -72,14 +85,11 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
         </li>
       </ol>
 
-      <form id="inquiry" action="https://api.web3forms.com/submit" method="POST" class="space-y-10">
-        <input type="hidden" name="access_key" value={accessKey} />
-        <input type="hidden" name="subject" value="Nová nezáväzná objednávka z webu Detičkovo" />
-        <input type="hidden" name="from_name" value="detickovocafe.sk" />
+      <form id="inquiry" action="/api/objednavka.php" method="POST" class="space-y-10">
         <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
 
         <fieldset data-step="1">
-          <legend class="mb-6 font-display text-2xl font-bold">Čo pripravujete?</legend>
+          <legend class="mb-6 font-display text-2xl font-bold">Čo pripravujete? <span class="text-brand-red" aria-hidden="true">*</span></legend>
           <div class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="radiogroup" aria-label="Typ akcie">
             {EVENT_TYPES.map((type) => (
               <label class="flex cursor-pointer flex-col items-center gap-2 rounded-2xl bg-cream p-5 text-center ring-2 ring-transparent transition has-checked:bg-brand-blue has-checked:text-white has-focus-visible:ring-ink/40 hover:ring-brand-blue/40">
@@ -95,7 +105,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
             </label>
           </div>
           <label id="ina-akcia-wrap" hidden class="mt-5 block">
-            <span class="mb-1.5 block text-sm font-semibold">Aká akcia to bude?</span>
+            <span class="mb-1.5 block text-sm font-semibold">Aká akcia to bude? <span class="text-brand-red" aria-hidden="true">*</span></span>
             <input
               type="text"
               name="Popis inej akcie"
@@ -106,7 +116,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
           </label>
           <div class="mt-6 grid gap-5 sm:grid-cols-2">
             <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Dátum akcie</span>
+              <span class="mb-1.5 block text-sm font-semibold">Dátum akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
               <input
                 type="date"
                 name="Dátum"
@@ -122,7 +132,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
               <input type="text" name="Čas" placeholder="napr. 14:00 – 18:00" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none" />
             </label>
             <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Miesto akcie</span>
+              <span class="mb-1.5 block text-sm font-semibold">Miesto akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
               <div class="relative">
                 <input
                   type="text"
@@ -151,7 +161,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
               </div>
             </label>
             <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Približný počet detí</span>
+              <span class="mb-1.5 block text-sm font-semibold">Približný počet detí <span class="text-brand-red" aria-hidden="true">*</span></span>
               <select name="Počet detí" required class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none">
                 <option value="" disabled selected>Vyberte…</option>
                 {childrenOptions.map((o) => <option value={o}>{o}</option>)}
@@ -207,15 +217,15 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
           <legend class="mb-6 font-display text-2xl font-bold">Kam vám pošleme ponuku?</legend>
           <div class="grid gap-5 sm:grid-cols-2">
             <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Meno a priezvisko</span>
+              <span class="mb-1.5 block text-sm font-semibold">Meno a priezvisko <span class="text-brand-red" aria-hidden="true">*</span></span>
               <input type="text" name="Meno" required autocomplete="name" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none" />
             </label>
             <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Telefón</span>
+              <span class="mb-1.5 block text-sm font-semibold">Telefón <span class="text-brand-red" aria-hidden="true">*</span></span>
               <input type="tel" name="Telefón" required autocomplete="tel" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none" />
             </label>
             <label class="block sm:col-span-2">
-              <span class="mb-1.5 block text-sm font-semibold">E-mail</span>
+              <span class="mb-1.5 block text-sm font-semibold">E-mail <span class="text-brand-red" aria-hidden="true">*</span></span>
               <input type="email" name="email" required autocomplete="email" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none" />
             </label>
             <label class="block sm:col-span-2">
@@ -227,15 +237,17 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
               <span class="text-sm text-muted">
                 Súhlasím so spracovaním osobných údajov na účely vypracovania ponuky a komunikácie.
                 Viac v <a href="/ochrana-sukromia" class="font-semibold text-brand-blue hover:underline">zásadách ochrany súkromia</a>.
+                <span class="text-brand-red" aria-hidden="true">*</span>
               </span>
             </label>
           </div>
         </fieldset>
+        <p class="mb-6 text-xs text-muted">Polia označené <span class="text-brand-red">*</span> sú povinné.</p>
 
         <div class="flex items-center justify-between gap-3">
           <button type="button" data-prev hidden class="btn-secondary">← Späť</button>
-          <button type="button" data-next class="btn-primary ml-auto">Pokračovať →</button>
-          <button type="submit" data-submit hidden class="btn-primary ml-auto">Odoslať nezáväznú objednávku</button>
+          <button type="button" data-next class="btn-primary ml-auto disabled:cursor-not-allowed disabled:opacity-40">Pokračovať →</button>
+          <button type="submit" data-submit hidden class="btn-primary ml-auto disabled:cursor-not-allowed disabled:opacity-40">Odoslať nezáväznú objednávku</button>
         </div>
         <p data-error hidden class="rounded-xl bg-brand-red/10 p-4 text-sm font-medium text-brand-red">
           Objednávku sa nepodarilo odoslať. Skúste to prosím znova alebo nám napíšte na info@detickovocafe.sk.
@@ -254,6 +266,9 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   const submitBtn = form.querySelector<HTMLButtonElement>('[data-submit]')!;
   const errorBox = form.querySelector<HTMLElement>('[data-error]')!;
   let current = 0;
+  // Spam time-trap: humans need more than a few seconds to fill a multi-step form
+  const openedAt = Date.now();
+  const MIN_FILL_MS = 5000;
 
   // Pre-select event type from ?typ= query param
   const typ = new URLSearchParams(location.search).get('typ');
@@ -283,6 +298,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     prevBtn.hidden = i === 0;
     nextBtn.hidden = i === steps.length - 1;
     submitBtn.hidden = i !== steps.length - 1;
+    syncButtons();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -290,6 +306,23 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     const fields = steps[i].querySelectorAll<HTMLInputElement>('input, select, textarea');
     return [...fields].every((f) => f.reportValidity());
   }
+
+  // Silent validity check (no browser popups) used to enable/disable the buttons
+  function stepComplete(i: number) {
+    const fields = steps[i].querySelectorAll<HTMLInputElement>('input, select, textarea');
+    if (![...fields].every((f) => f.checkValidity())) return false;
+    if (i === 1 && maskotiService?.checked && mascotChecks.filter((c) => c.checked).length < 2) return false;
+    return true;
+  }
+
+  function syncButtons() {
+    const ok = stepComplete(current);
+    nextBtn.disabled = !ok;
+    if (current === steps.length - 1) submitBtn.disabled = !ok;
+  }
+
+  form.addEventListener('input', syncButtons);
+  form.addEventListener('change', syncButtons);
 
   // Mascot picker: shown when the Maskoti service is checked; requires at least 2 picks
   const maskotiService = form.querySelector<HTMLInputElement>('input[name="Služby"][value="Maskoti"]');
@@ -303,6 +336,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
       mascotChecks.forEach((c) => (c.checked = false));
       mascotError.hidden = true;
     }
+    syncButtons();
   });
 
   function mascotsValid() {
@@ -341,17 +375,31 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     if (stepValid(current) && (current !== 1 || mascotsValid())) show(current + 1);
   });
 
+  syncButtons();
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!stepValid(current) || !mascotsValid()) return;
+    // Spam guards: filled honeypot or an impossibly fast submission → pretend success
+    const honeypot = form.querySelector<HTMLInputElement>('input[name="botcheck"]');
+    if (honeypot?.checked || Date.now() - openedAt < MIN_FILL_MS) {
+      location.href = '/objednavka/dakujeme/';
+      return;
+    }
     submitBtn.disabled = true;
     submitBtn.textContent = 'Odosielam…';
     errorBox.hidden = true;
     try {
+      // Send as JSON: multipart/form-data mangles diacritics in field names
+      const payload: Record<string, string> = {};
+      for (const [key, value] of new FormData(form)) {
+        if (typeof value !== 'string') continue;
+        payload[key] = key in payload ? `${payload[key]}, ${value}` : value;
+      }
       const res = await fetch(form.action, {
         method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' },
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       });
       if (!res.ok) throw new Error(String(res.status));
       location.href = '/objednavka/dakujeme/';

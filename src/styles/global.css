@@ -55,3 +55,16 @@
 @utility kicker {
   @apply mb-3 block font-display text-sm font-bold uppercase tracking-widest text-brand-blue;
 }
+
+/* Header tone: white by default, cream while resting on a cream hero, frosted once scrolled.
+   Unlayered on purpose so it wins over the utility classes on the header. */
+#site-header {
+  @apply border-transparent bg-white;
+}
+body:has(main > section.bg-cream:first-child) #site-header:not([data-scrolled]),
+body:has(main > article:first-child > section.bg-cream:first-child) #site-header:not([data-scrolled]) {
+  @apply bg-cream;
+}
+#site-header[data-scrolled] {
+  @apply border-ink/5 bg-white/90;
+}

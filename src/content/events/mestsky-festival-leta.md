@@ -10,4 +10,4 @@ gallery: [/uploads/gallery-1.svg, /uploads/gallery-2.svg, /uploads/gallery-3.svg
 featured: true
 ---
 
-Celodenná detská zóna na mestskom festivale – od 10:00 do 20:00. Šesť stanovíšť, striedanie maskotov, dve bublinové šou a tvorivé dielne, ktorými prešlo vyše 500 detí.
+Celodenná detská zóna na mestskom festivale – od 10:00 do 20:00. Šesť stanovíšť, striedanie maskotov, bublinový workshop a tvorivé dielne, ktorými prešlo vyše 500 detí.

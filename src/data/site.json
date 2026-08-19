@@ -1,11 +1,14 @@
 {
   "name": "Detičkovo",
+  "maintenance": false,
   "tagline": "Detský program pre mestá, školy, firmy aj rodinné oslavy",
   "email": "info@detickovocafe.sk",
-  "phone": "+421 948 423 858",
-  "phoneDisplay": "0948 423 858",
+  "phone": "+421 908 364 560",
+  "phoneDisplay": "0908 364 560",
+  "phone2": "+421 948 423 858",
+  "phone2Display": "0948 423 858",
   "facebook": "https://www.facebook.com/detickovocafe.sk",
-  "instagram": "https://www.instagram.com/detickovo",
+  "instagram": "https://www.instagram.com/detickovo_kosice",
   "city": "Košice a okolie · pôsobíme po celom Slovensku",
   "founded": "2017-05-01",
   "stats": [
