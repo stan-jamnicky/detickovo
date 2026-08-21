@@ -59,12 +59,9 @@ jobs:
             FTP_PASS: ${{ secrets.FTP_PASSWORD }}
             FTP_HOST: ${{ secrets.FTP_SERVER }}
         run: |
-          echo "Username character length: ${#FTP_USER}"
-          echo "Password character length: ${#FTP_PASS}"
-          echo "Host character length: ${#FTP_HOST}"
           sudo apt-get update && sudo apt-get install -y lftp
-          lftp -c "
+          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" <<'EOF'
           set ftp:ssl-allow no;
-          open -u '${FTP_USER}','${FTP_PASS}' '${FTP_HOST}';
           mirror --reverse --verbose ./dist/ ./www/test/;
-          "
+          quit
+          EOF
