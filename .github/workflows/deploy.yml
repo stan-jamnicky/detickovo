@@ -1,17 +1,12 @@
-name: Deploy showcase to GitHub Pages and FTP Prod
+name: Deploy Production to Forpsi FTP
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
-  group: pages
+  group: prod-ftp-deploy
   cancel-in-progress: true
 
 jobs:
@@ -19,35 +14,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
+
       - run: npm run build
         env:
           PUBLIC_WEB3FORMS_KEY: ${{ secrets.PUBLIC_WEB3FORMS_KEY }}
-      - run: node scripts/gh-pages-base.mjs
+
       - run: touch dist/.nojekyll
+
       - uses: actions/upload-artifact@v4
         with:
           name: dist-files
           path: dist
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
 
-  deploy-pages:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
-
-  deploy-ftp:
+  deploy-prod:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -55,11 +41,15 @@ jobs:
         with:
           name: dist-files
           path: dist
-      - name: Deploy to Forpsi via LFTP
+
+      - name: Deploy to Forpsi Prod via LFTP
+        env:
+          FTP_USER: ${{ secrets.FTP_USERNAME }}
+          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
         run: |
           sudo apt-get update && sudo apt-get install -y lftp
-          lftp -c "
+          lftp -u "$FTP_USER","$FTP_PASS" d115wh.forpsi.com <<'EOF'
           set ftp:ssl-allow no;
-          open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' d115wh.forpsi.com;
-          mirror --reverse --verbose ./dist/ ./www/test/;
-          "
+          mirror --reverse --verbose ./dist/ ./www/;
+          quit
+          EOF
