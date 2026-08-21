@@ -1,12 +1,17 @@
-name: Deploy Production to Forpsi FTP
+name: Deploy showcase to GitHub Pages and FTP Prod
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
-  group: prod-ftp-deploy
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -14,26 +19,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-
       - run: npm run build
-        env:
-          PUBLIC_WEB3FORMS_KEY: ${{ secrets.PUBLIC_WEB3FORMS_KEY }}
-
+      - run: node scripts/gh-pages-base.mjs
       - run: touch dist/.nojekyll
-
       - uses: actions/upload-artifact@v4
         with:
           name: dist-files
           path: dist
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
 
-  deploy-prod:
+  deploy-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  deploy-ftp:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -41,15 +53,18 @@ jobs:
         with:
           name: dist-files
           path: dist
-
-      - name: Deploy to Forpsi Prod via LFTP
+      - name: Deploy to Forpsi via LFTP
         env:
-          FTP_USER: ${{ secrets.FTP_USERNAME }}
-          FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+            FTP_USER: ${{ secrets.FTP_USERNAME }}
+            FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+            FTP_HOST: ${{ secrets.FTP_SERVER }}
         run: |
+          echo "Username character length: ${#FTP_USER}"
+          echo "Password character length: ${#FTP_PASS}"
+          echo "Host character length: ${#FTP_HOST}"
           sudo apt-get update && sudo apt-get install -y lftp
-          lftp -u "$FTP_USER","$FTP_PASS" d115wh.forpsi.com <<'EOF'
+          lftp -c "
           set ftp:ssl-allow no;
-          mirror --reverse --verbose ./dist/ ./www/;
-          quit
-          EOF
+          open -u '${FTP_USER}','${FTP_PASS}' '${FTP_HOST}';
+          mirror --reverse --verbose ./dist/ ./www/test/;
+          "
