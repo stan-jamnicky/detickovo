@@ -61,5 +61,5 @@ jobs:
           lftp -c "
           set ftp:ssl-allow no;
           open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' d115wh.forpsi.com;
-          mirror --reverse --verbose --no-perms --no-mtime ./dist/ ./www/test/;
+          mirror --reverse --verbose ./dist/ ./www/test/;
           "
