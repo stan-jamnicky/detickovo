@@ -62,4 +62,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: ./www/test # Update this to your web root folder on Forpsi (e.g., ./www/)
+          server-dir: ./www/test/ # Update this to your web root folder on Forpsi (e.g., ./www/)
