@@ -55,13 +55,11 @@ jobs:
         with:
           name: dist-files
           path: dist
-      - name: Deploy to Forpsi via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: ./www/test/
-          protocol: ftp
-          port: 21
+      - name: Deploy to Forpsi via LFTP
+        run: |
+          sudo apt-get update && sudo apt-get install -y lftp
+          lftp -c "
+          set ftp:ssl-allow no;
+          open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' d115wh.forpsi.com;
+          mirror --reverse --verbose --no-perms --no-mtime ./dist/ ./www/test/;
+          "
