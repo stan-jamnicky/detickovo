@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import site from '../data/site.json';
+import Base from '../layouts/Base.astro';
 
 const maintenance = site.maintenance ?? false;
 ---
@@ -24,17 +25,47 @@ const maintenance = site.maintenance ?? false;
       if (nahlad === '1' || !maintenance) location.replace('/');
     </script>
   </head>
-  <body class="flex min-h-screen flex-col items-center justify-center bg-cream px-5 text-center">
-    <main>
-      <p class="text-7xl" aria-hidden="true">🎪</p>
-      <h1 class="mt-6 text-3xl sm:text-4xl">Prepáčte, máme prestávku</h1>
-      <p class="mx-auto mt-4 max-w-md text-muted">
-        Na webe {site.name} práve pracujeme. Čoskoro sme späť – zatiaľ nás zastihnete telefonicky alebo e‑mailom.
-      </p>
-      <div class="mt-8 flex flex-col items-center gap-2 font-display font-semibold">
-        <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="text-brand-blue hover:text-brand-blue-dark">{site.phoneDisplay}</a>
-        <a href={`mailto:${site.email}`} class="text-brand-blue hover:text-brand-blue-dark">{site.email}</a>
+  <body class="bg-cream2">
+    <!-- Hero -->
+  <section class="overflow-hidden bg-cream2">
+    <div class="relative mx-auto max-w-[100rem] lg:h-screen">
+      <img
+        src="/maintenance_page.png"
+        alt=""
+        aria-hidden="true"
+        width="3344"
+        height="1882"
+        class="absolute top-1/2 hidden w-[55%] -translate-y-1/2 md:right-0 md:block lg:-right-[15%] lg:w-[75%]"
+        fetchpriority="high"
+      />
+      <div class="lg:h-screen container-site relative flex items-center pt-14 pb-0 sm:pt-16 md:min-h-[34rem] md:py-16 lg:min-h-[42rem] lg:py-20">
+        <div class="relative mx-auto max-w-xl text-center md:mx-0 md:text-left">
+          <a href="/" class="flex items-center mb-8 justify-center-safe lg:justify-start">
+            <img src="/logo_2026.png" alt="Detičkovo" class="h-7 w-auto" width="615" height="108" />
+          </a>
+          <h1 class="text-4xl sm:text-6xl">Čoskoro sme späť!</h1>
+          <p class="mx-auto mt-5 max-w-lg text-lg text-muted md:mx-0">
+            Na webe {site.name} práve pracujeme. Zatiaľ nás zastihnete telefonicky alebo e‑mailom.
+          </p>
+          <div class="mt-8 flex flex-col gap-2 font-display font-semibold">
+            <span>
+              <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="text-brand-blue hover:text-brand-blue-dark">{site.phoneDisplay}</a>
+              <span class="mx-2">/</span>
+              <a href={`tel:${site.phone.replace(/\s/g, '')}`} class="text-brand-blue hover:text-brand-blue-dark">{site.phone2Display}</a>
+            </span>
+            <a href={`mailto:${site.email}`} class="text-brand-blue hover:text-brand-blue-dark">{site.email}</a>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
+    <img
+      src="/maintenance_page.png"
+      alt="Deti na akcii s animátormi a maskotmi Detičkova"
+      width="3344"
+      height="1882"
+      class="relative -mb-[5%] -ml-[12.5%] w-[125%] max-w-none md:hidden xs:hidden"
+      fetchpriority="high"
+    />
+  </section>
   </body>
 </html>
