@@ -6,7 +6,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://www.detickovocafe.sk',
+  site: 'https://www.detickovoakcie.sk',
   integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()]

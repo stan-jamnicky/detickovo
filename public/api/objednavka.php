@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
 
-const RECIPIENT = 'info@detickovocafe.sk';
-const SENDER = 'info@detickovocafe.sk'; // musí byť existujúca schránka na doméne (požiadavka FORPSI)
+const RECIPIENT = 'info@detickovoakcie.sk';
+const SENDER = 'info@detickovoakcie.sk'; // musí byť existujúca schránka na doméne (požiadavka FORPSI)
 const SUBJECT = 'Nová nezáväzná objednávka z webu Detičkovo';
 const MAX_FIELD_LEN = 3000;
 const RATE_LIMIT = 5;          // max. odoslaní…
