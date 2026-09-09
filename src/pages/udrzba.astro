@@ -16,13 +16,7 @@ const maintenance = site.maintenance ?? false;
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/png" href="/fav_icon.png" />
     <script is:inline define:vars={{ maintenance }}>
-      // ?nahlad=1 lets the admin browse the live site, ?nahlad=0 turns it off again
-      var nahlad = new URLSearchParams(location.search).get('nahlad');
-      try {
-        if (nahlad === '1') localStorage.setItem('detickovo-nahlad', '1');
-        if (nahlad === '0') localStorage.removeItem('detickovo-nahlad');
-      } catch (e) {}
-      if (nahlad === '1' || !maintenance) location.replace('/');
+      if (!maintenance) location.replace('/');
     </script>
   </head>
   <body class="bg-cream2">

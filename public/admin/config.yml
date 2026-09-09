@@ -105,7 +105,7 @@ collections:
         file: src/data/site.json
         fields:
           - { name: name, label: Názov, widget: string }
-          - { name: maintenance, label: Režim údržby, widget: boolean, default: false, hint: "Zapne stránku „Prepáčte, máme prestávku“ pre návštevníkov. Ako admin uvidíte web cez /udrzba?nahlad=1" }
+          - { name: maintenance, label: Režim údržby, widget: boolean, default: false, hint: "Zapne stránku „Prepáčte, máme prestávku“ pre návštevníkov." }
           - { name: tagline, label: Slogan, widget: string }
           - { name: email, label: E-mail, widget: string }
           - { name: phone, label: Telefón (medzinárodný), widget: string }

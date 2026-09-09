@@ -22,12 +22,8 @@ const maintenance = site.maintenance ?? false;
     <meta charset="UTF-8" />
     {maintenance && (
       <script is:inline>
-        // Maintenance gate — admins bypass it via /udrzba?nahlad=1
         try {
-          var q = new URLSearchParams(location.search).get('nahlad');
-          if (q === '1') localStorage.setItem('detickovo-nahlad', '1');
-          if (q === '0') localStorage.removeItem('detickovo-nahlad');
-          if (localStorage.getItem('detickovo-nahlad') !== '1') location.replace('/udrzba');
+          location.replace('/udrzba');
         } catch (e) {
           location.replace('/udrzba');
         }
