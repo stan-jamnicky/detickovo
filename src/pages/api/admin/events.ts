@@ -36,7 +36,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   try {
     if (action === 'create') {
-      await createEventPost(input);
+      const position = formData.get('position') === 'bottom' ? 'bottom' : 'top';
+      await createEventPost(input, position);
     } else if (action === 'update') {
       await updateEventPost(id, input);
     } else if (action === 'delete') {

@@ -120,15 +120,20 @@ export async function filterEventPosts(filter: EventPostFilter) {
   return (await cursor.toArray()).map(toEventPost);
 }
 
-export async function createEventPost(input: EventPostInput) {
+export async function createEventPost(input: EventPostInput, position: 'top' | 'bottom' = 'top') {
   const data = validateEventPostInput(input);
   const collection = await getCollection();
-  const lowest = await collection.find({ order: { $exists: true } }).sort({ order: 1 }).limit(1).toArray();
+  const edge = await collection
+    .find({ order: { $exists: true } })
+    .sort({ order: position === 'top' ? 1 : -1 })
+    .limit(1)
+    .toArray();
+  const order = position === 'top' ? (edge[0]?.order ?? 0) - 1 : (edge[0]?.order ?? 0) + 1;
   const now = new Date();
   await collection.insertOne({
     _id: new ObjectId(),
     ...data,
-    order: (lowest[0]?.order ?? 0) - 1,
+    order,
     createdAt: now,
     updatedAt: now,
   });

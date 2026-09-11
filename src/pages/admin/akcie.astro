@@ -222,7 +222,8 @@ const shortenUrl = (value: string) => {
               </div>
 
               <div class="mt-6 flex flex-wrap gap-3">
-                <button type="submit" class="btn-primary !px-5 !py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50" data-save-button data-editor-save>Pridať akciu</button>
+                <button type="submit" name="position" value="top" class="btn-primary !px-5 !py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50" data-save-button data-editor-save>Pridať na začiatok</button>
+                <button type="submit" name="position" value="bottom" class="btn-secondary !px-5 !py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50" data-save-button data-editor-save-end>Pridať na koniec</button>
                 <button type="submit" name="action" value="delete" class="hidden btn-secondary !px-5 !py-2.5 text-sm !text-brand-red" data-confirm-delete data-editor-delete>Zmazať</button>
               </div>
             </form>
@@ -303,7 +304,8 @@ const shortenUrl = (value: string) => {
     const frame = scope.querySelector<HTMLIFrameElement>('[data-preview-frame]');
     const empty = scope.querySelector<HTMLElement>('[data-preview-empty]');
     const error = scope.querySelector<HTMLElement>('[data-preview-error]');
-    const saveButton = scope.querySelector<HTMLButtonElement>('[data-save-button]');
+    const saveButtons = [...scope.querySelectorAll<HTMLButtonElement>('[data-save-button]')];
+    const setSaveDisabled = (disabled: boolean) => saveButtons.forEach((button) => { button.disabled = disabled; });
 
     const updatePreview = () => {
       if (!urlField || !heightField || !frame) return;
@@ -318,7 +320,7 @@ const shortenUrl = (value: string) => {
         frame.classList.add('hidden');
         empty?.classList.remove('hidden');
         error?.classList.add('hidden');
-        if (saveButton) saveButton.disabled = true;
+        setSaveDisabled(true);
         frame.removeAttribute('src');
         return;
       }
@@ -328,7 +330,7 @@ const shortenUrl = (value: string) => {
         frame.classList.add('hidden');
         empty?.classList.add('hidden');
         error?.classList.remove('hidden');
-        if (saveButton) saveButton.disabled = true;
+        setSaveDisabled(true);
         frame.removeAttribute('src');
         return;
       }
@@ -337,7 +339,7 @@ const shortenUrl = (value: string) => {
       frame.classList.remove('hidden');
       empty?.classList.add('hidden');
       error?.classList.add('hidden');
-      if (saveButton) saveButton.disabled = false;
+      setSaveDisabled(false);
     };
 
     urlField?.addEventListener('input', updatePreview);
@@ -358,6 +360,7 @@ const shortenUrl = (value: string) => {
   const editorId = editorDialog?.querySelector<HTMLInputElement>('[data-editor-id]');
   const editorKicker = editorDialog?.querySelector<HTMLElement>('[data-editor-kicker]');
   const editorSave = editorDialog?.querySelector<HTMLButtonElement>('[data-editor-save]');
+  const editorSaveEnd = editorDialog?.querySelector<HTMLButtonElement>('[data-editor-save-end]');
   const editorDelete = editorDialog?.querySelector<HTMLButtonElement>('[data-editor-delete]');
 
   const openEditor = (mode: 'create' | 'edit', data?: { id: string; eventType: string; url: string; height: string }) => {
@@ -366,7 +369,8 @@ const shortenUrl = (value: string) => {
     editorAction.value = mode === 'create' ? 'create' : 'update';
     editorId.value = data?.id ?? '';
     if (editorKicker) editorKicker.textContent = mode === 'create' ? 'Nová akcia' : 'Upraviť akciu';
-    if (editorSave) editorSave.textContent = mode === 'create' ? 'Pridať akciu' : 'Uložiť zmeny';
+    if (editorSave) editorSave.textContent = mode === 'create' ? 'Pridať na začiatok' : 'Uložiť zmeny';
+    editorSaveEnd?.classList.toggle('hidden', mode === 'edit');
     editorDelete?.classList.toggle('hidden', mode === 'create');
 
     const typeField = editorForm.querySelector<HTMLSelectElement>('[name="eventType"]');
