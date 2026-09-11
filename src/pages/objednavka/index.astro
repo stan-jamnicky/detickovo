@@ -76,7 +76,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
         <li class="h-px flex-1 bg-ink/15" aria-hidden="true"></li>
         <li class="flex items-center gap-2 opacity-40" data-progress-step="2">
           <span class="flex h-8 w-8 items-center justify-center rounded-full bg-sand">2</span>
-          <span class="hidden sm:inline">Požiadavky</span>
+          <span class="hidden sm:inline" data-step-2-label>Požiadavky</span>
         </li>
         <li class="h-px flex-1 bg-ink/15" aria-hidden="true"></li>
         <li class="flex items-center gap-2 opacity-40" data-progress-step="3">
@@ -104,6 +104,8 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
               <span class="text-sm font-semibold">Iná akcia</span>
             </label>
           </div>
+
+          <!-- Iná akcia description -->
           <label id="ina-akcia-wrap" hidden class="mt-5 block">
             <span class="mb-1.5 block text-sm font-semibold">Aká akcia to bude? <span class="text-brand-red" aria-hidden="true">*</span></span>
             <input
@@ -114,9 +116,24 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
               class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none"
             />
           </label>
+
+          <!-- Pobytový tábor info callout -->
+          <div id="tabor-info-callout" hidden class="mt-6 rounded-2xl border border-brand-green/20 bg-brand-green/10 p-5 text-ink">
+            <div class="flex items-start gap-3">
+              <span class="text-3xl" aria-hidden="true">🏕️</span>
+              <div>
+                <p class="font-display font-bold text-base text-ink">Pobytový tábor – 1 letný turnus v roku</p>
+                <p class="mt-1 text-sm text-muted leading-relaxed">
+                  Pobytový tábor organizujeme raz ročne počas letných prázdnin. Vyplnením nezáväznej objednávky odošlete predbežnú registráciu. Následne vás budeme kontaktovať e-mailom ohľadom dostupnosti voľných miest a presného termínu.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div class="mt-6 grid gap-5 sm:grid-cols-2">
-            <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Dátum akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
+            <!-- Dátum (skryté pre Pobytový tábor) -->
+            <label class="block" id="datum-wrap">
+              <span class="mb-1.5 block text-sm font-semibold" id="datum-label">Dátum akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
               <input
                 type="date"
                 name="Dátum"
@@ -125,14 +142,53 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 placeholder="Vyberte dátum…"
                 class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none"
               />
-              <span class="mt-1.5 block text-xs text-muted">Rezervácia termínu je možná minimálne 7 dní pred akciou.</span>
+              <span id="datum-hint" class="mt-1.5 block text-xs text-muted">Rezervácia termínu je možná minimálne 7 dní pred akciou.</span>
             </label>
+
+            <!-- Čas & Trvanie -->
+            <div class="block" id="cas-container">
+              <!-- Standard event time + duration -->
+              <div id="cas-standard-wrap">
+                <span class="mb-1.5 block text-sm font-semibold">Čas začiatku a trvanie <span class="text-brand-red" aria-hidden="true">*</span></span>
+                <div class="space-y-2">
+                  <input
+                    type="text"
+                    id="cas-start"
+                    placeholder="Čas začiatku (napr. 14:00)"
+                    value="14:00"
+                    class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none"
+                  />
+                  <div class="flex flex-wrap gap-1.5" role="group" aria-label="Trvanie programu">
+                    <button type="button" class="chip cursor-pointer text-xs font-semibold transition !bg-ink !text-white" data-duration="2 hodiny">2 hodiny (odporúčané)</button>
+                    <button type="button" class="chip cursor-pointer text-xs font-semibold transition hover:bg-ink/10" data-duration="1 hodina">1 hodina</button>
+                    <button type="button" class="chip cursor-pointer text-xs font-semibold transition hover:bg-ink/10" data-duration="3 hodiny">3 hodiny</button>
+                    <button type="button" class="chip cursor-pointer text-xs font-semibold transition hover:bg-ink/10" data-duration="Celý deň (4+ hodín)">Celý deň (4+ hod)</button>
+                    <button type="button" class="chip cursor-pointer text-xs font-semibold transition hover:bg-ink/10" data-duration="custom">Iné</button>
+                  </div>
+                  <input
+                    type="text"
+                    id="cas-custom-duration"
+                    placeholder="Zadajte vlastnú dĺžku (napr. 5 hodín)…"
+                    hidden
+                    class="w-full rounded-xl border border-ink/15 bg-white px-4 py-2 text-xs focus:border-brand-blue focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <!-- Pobytový tábor fixed duration card -->
+              <div id="cas-tabor-wrap" hidden class="rounded-2xl border border-brand-green/25 bg-cream p-4">
+                <span class="block text-xs font-bold uppercase tracking-wider text-brand-green">Dĺžka pobytu</span>
+                <p class="mt-1 font-display font-bold text-ink text-sm">Celotýždňový pobyt (7 dní)</p>
+                <p class="mt-0.5 text-xs text-muted">Kompletný celodenný program počas celého tábora.</p>
+              </div>
+
+              <!-- Form-ready submitted field -->
+              <input type="hidden" name="Čas" id="cas-final" required value="14:00 (trvanie: 2 hodiny)" />
+            </div>
+
+            <!-- Miesto -->
             <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Čas (približne)</span>
-              <input type="text" name="Čas" placeholder="napr. 14:00 – 18:00" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none" />
-            </label>
-            <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Miesto akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
+              <span class="mb-1.5 block text-sm font-semibold" id="miesto-label">Miesto akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
               <div class="relative">
                 <input
                   type="text"
@@ -160,9 +216,11 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 ></ul>
               </div>
             </label>
-            <label class="block">
-              <span class="mb-1.5 block text-sm font-semibold">Približný počet detí <span class="text-brand-red" aria-hidden="true">*</span></span>
-              <select name="Počet detí" required class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none">
+
+            <!-- Počet detí (skryté pre Pobytový tábor) -->
+            <label class="block" id="pocet-deti-wrap">
+              <span class="mb-1.5 block text-sm font-semibold" id="pocet-deti-label">Približný počet detí <span class="text-brand-red" aria-hidden="true">*</span></span>
+              <select name="Počet detí" id="pocet-deti-select" required class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none">
                 <option value="" disabled selected>Vyberte…</option>
                 {childrenOptions.map((o) => <option value={o}>{o}</option>)}
               </select>
@@ -171,46 +229,105 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
         </fieldset>
 
         <fieldset data-step="2" hidden>
-          <legend class="mb-6 font-display text-2xl font-bold">Čo by ste chceli v programe?</legend>
-          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {services.map((s) => (
-              <label class="flex cursor-pointer flex-col items-center gap-2 rounded-2xl bg-cream p-5 text-center ring-2 ring-transparent transition has-checked:bg-brand-blue has-checked:text-white has-focus-visible:ring-ink/40 hover:ring-brand-blue/40">
-                <input type="checkbox" name="Služby" value={s.data.title} class="sr-only" />
-                <span class="text-4xl" aria-hidden="true">{s.data.icon}</span>
-                <span class="text-sm font-semibold">{s.data.title}</span>
-                <span class="text-xs leading-snug opacity-70">{s.data.description}</span>
-              </label>
-            ))}
-          </div>
-          <div data-mascot-picker hidden class="mt-8">
-            <p class="font-display text-lg font-bold">Vyberte maskotov <span class="font-sans text-sm font-normal text-muted">(minimálne 2)</span></p>
-            <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter maskotov">
-              <button type="button" class="chip !bg-ink !text-white" data-mascot-filter="all">Všetci</button>
-              {MASCOT_CATEGORIES.map((c) => (
-                <button type="button" class="chip hover:bg-ink/10" data-mascot-filter={c.id}>{c.label}</button>
-              ))}
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {mascots.map((m) => (
-                <label
-                  class="group cursor-pointer overflow-hidden rounded-2xl bg-white ring-2 ring-ink/10 transition has-checked:ring-brand-blue hover:ring-brand-blue/40"
-                  data-mascot-card
-                  data-mascot-category={m.data.category}
-                >
-                  <input type="checkbox" name="Maskoti" value={m.data.name} class="sr-only" data-mascot-check data-mascot-id={m.id} />
-                  <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="aspect-square w-full object-cover" />
-                  <span class="block p-2 text-center text-xs font-semibold transition group-has-checked:bg-brand-blue group-has-checked:text-white">{m.data.name}</span>
+          <!-- Standard event services -->
+          <div id="step2-standard">
+            <legend class="mb-6 font-display text-2xl font-bold">Čo by ste chceli v programe?</legend>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {services.map((s) => (
+                <label class="flex cursor-pointer flex-col items-center gap-2 rounded-2xl bg-cream p-5 text-center ring-2 ring-transparent transition has-checked:bg-brand-blue has-checked:text-white has-focus-visible:ring-ink/40 hover:ring-brand-blue/40">
+                  <input type="checkbox" name="Služby" value={s.data.title} class="sr-only" />
+                  <span class="text-4xl" aria-hidden="true">{s.data.icon}</span>
+                  <span class="text-sm font-semibold">{s.data.title}</span>
+                  <span class="text-xs leading-snug opacity-70">{s.data.description}</span>
                 </label>
               ))}
             </div>
-            <p data-mascot-error hidden class="mt-3 rounded-xl bg-brand-red/10 p-3 text-sm font-medium text-brand-red">
-              Vyberte prosím aspoň 2 maskotov.
-            </p>
+            <div data-mascot-picker hidden class="mt-8">
+              <p class="font-display text-lg font-bold">Vyberte maskotov <span class="font-sans text-sm font-normal text-muted">(minimálne 2)</span></p>
+              <div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter maskotov">
+                <button type="button" class="chip !bg-ink !text-white" data-mascot-filter="all">Všetci</button>
+                {MASCOT_CATEGORIES.map((c) => (
+                  <button type="button" class="chip hover:bg-ink/10" data-mascot-filter={c.id}>{c.label}</button>
+                ))}
+              </div>
+              <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {mascots.map((m) => (
+                  <label
+                    class="group cursor-pointer overflow-hidden rounded-2xl bg-white ring-2 ring-ink/10 transition has-checked:ring-brand-blue hover:ring-brand-blue/40"
+                    data-mascot-card
+                    data-mascot-category={m.data.category}
+                  >
+                    <input type="checkbox" name="Maskoti" value={m.data.name} class="sr-only" data-mascot-check data-mascot-id={m.id} />
+                    <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="aspect-square w-full object-cover" />
+                    <span class="block p-2 text-center text-xs font-semibold transition group-has-checked:bg-brand-blue group-has-checked:text-white">{m.data.name}</span>
+                  </label>
+                ))}
+              </div>
+              <p data-mascot-error hidden class="mt-3 rounded-xl bg-brand-red/10 p-3 text-sm font-medium text-brand-red">
+                Vyberte prosím aspoň 2 maskotov.
+              </p>
+            </div>
+            <label class="mt-6 block">
+              <span class="mb-1.5 block text-sm font-semibold">Iné požiadavky (nepovinné)</span>
+              <textarea name="Iné požiadavky" id="ine-poziadavky-standard" rows="3" placeholder="Čokoľvek, čo by sme mali vedieť…" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none"></textarea>
+            </label>
           </div>
-          <label class="mt-6 block">
-            <span class="mb-1.5 block text-sm font-semibold">Iné požiadavky (nepovinné)</span>
-            <textarea name="Iné požiadavky" rows="3" placeholder="Čokoľvek, čo by sme mali vedieť…" class="w-full rounded-xl border border-ink/15 px-4 py-3 focus:border-brand-blue focus:outline-none"></textarea>
-          </label>
+
+          <!-- Pobytový tábor specific step 2 -->
+          <div id="step2-tabor" hidden>
+            <legend class="mb-2 font-display text-2xl font-bold">Údaje o dieťati a požiadavky na pobyt</legend>
+            <p class="mb-6 text-sm text-muted">
+              Celotýždňový program (animátori, maskoti, tematické dni a súťaže) je automaticky súčasťou tábora. Uveďte nám prosím dôležité informácie k dieťaťu:
+            </p>
+
+            <div class="space-y-6">
+              <label class="block">
+                <span class="mb-1.5 block text-sm font-semibold">Meno a vek prihlasovaného dieťaťa (alebo viacerých detí) <span class="text-brand-red" aria-hidden="true">*</span></span>
+                <input
+                  type="text"
+                  id="tabor-deti-info"
+                  placeholder="napr. Jakub (9 rokov), Sofia (11 rokov)"
+                  class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none"
+                />
+              </label>
+
+              <div class="block">
+                <span class="mb-2 block text-sm font-semibold">Stravovacie požiadavky a diéty</span>
+                <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="group" aria-label="Stravovacie požiadavky">
+                  <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
+                    <input type="checkbox" name="tabor_strava" value="Bežná strava" class="accent-brand-blue" />
+                    <span>Bežná strava</span>
+                  </label>
+                  <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
+                    <input type="checkbox" name="tabor_strava" value="Vegetariánska" class="accent-brand-blue" />
+                    <span>Vegetariánska</span>
+                  </label>
+                  <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
+                    <input type="checkbox" name="tabor_strava" value="Bezlepková (celiakia)" class="accent-brand-blue" />
+                    <span>Bezlepková</span>
+                  </label>
+                  <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
+                    <input type="checkbox" name="tabor_strava" value="Bezlaktózová" class="accent-brand-blue" />
+                    <span>Bezlaktózová</span>
+                  </label>
+                  <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80 sm:col-span-2">
+                    <input type="checkbox" name="tabor_strava" value="Potravinové alergie / Iná diéta" class="accent-brand-blue" />
+                    <span>Potravinové alergie / Iné</span>
+                  </label>
+                </div>
+              </div>
+
+              <label class="block">
+                <span class="mb-1.5 block text-sm font-semibold">Zdravotné obmedzenia, alergie a poznámky (nepovinné)</span>
+                <textarea
+                  id="tabor-zdravie-info"
+                  rows="3"
+                  placeholder="Alergie, užívané lieky, plavec/neplavec alebo iné dôležité informácie pre vedúcich tábora…"
+                  class="w-full rounded-xl border border-ink/15 bg-white px-4 py-3 focus:border-brand-blue focus:outline-none"
+                ></textarea>
+              </label>
+            </div>
+          </div>
         </fieldset>
 
         <fieldset data-step="3" hidden>
@@ -270,6 +387,67 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   const openedAt = Date.now();
   const MIN_FILL_MS = 5000;
 
+  // Elements for dynamic Pobytový tábor & Time field behavior
+  const taborCallout = document.getElementById('tabor-info-callout') as HTMLElement;
+  const datumWrap = document.getElementById('datum-wrap') as HTMLElement;
+  const datumLabel = document.getElementById('datum-label') as HTMLElement;
+  const datumInput = document.getElementById('datum') as HTMLInputElement;
+  const datumHint = document.getElementById('datum-hint') as HTMLElement;
+  const casStandardWrap = document.getElementById('cas-standard-wrap') as HTMLElement;
+  const casTaborWrap = document.getElementById('cas-tabor-wrap') as HTMLElement;
+  const casStartInput = document.getElementById('cas-start') as HTMLInputElement;
+  const casDurationChips = [...document.querySelectorAll<HTMLButtonElement>('[data-duration]')];
+  const casCustomDuration = document.getElementById('cas-custom-duration') as HTMLInputElement;
+  const casFinal = document.getElementById('cas-final') as HTMLInputElement;
+  const miestoLabel = document.getElementById('miesto-label') as HTMLElement;
+  const miestoInput = document.getElementById('miesto') as HTMLInputElement;
+  const pocetDetiWrap = document.getElementById('pocet-deti-wrap') as HTMLElement;
+  const pocetDetiLabel = document.getElementById('pocet-deti-label') as HTMLElement;
+  const pocetDetiSelect = document.getElementById('pocet-deti-select') as HTMLSelectElement;
+  const step2Standard = document.getElementById('step2-standard') as HTMLElement;
+  const step2Tabor = document.getElementById('step2-tabor') as HTMLElement;
+  const step2Label = document.querySelector<HTMLElement>('[data-step-2-label]')!;
+  const taborDetiInput = document.getElementById('tabor-deti-info') as HTMLInputElement;
+  const taborZdravieInput = document.getElementById('tabor-zdravie-info') as HTMLTextAreaElement;
+
+  let selectedDuration = '2 hodiny';
+
+  function isTaborSelected() {
+    const checked = form.querySelector<HTMLInputElement>('input[name="Typ akcie"]:checked');
+    return checked?.dataset.typeId === 'pobytovy-tabor';
+  }
+
+  function updateFinalCas() {
+    if (isTaborSelected()) {
+      casFinal.value = 'Celotýždňový pobytový tábor (1 turnus / 7 dní)';
+    } else {
+      const start = casStartInput.value.trim() || '14:00';
+      const dur = selectedDuration === 'custom'
+        ? (casCustomDuration.value.trim() || 'podľa dohody')
+        : selectedDuration;
+      casFinal.value = `${start} (trvanie: ${dur})`;
+    }
+  }
+
+  casDurationChips.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      casDurationChips.forEach((b) => b.classList.remove('!bg-ink', '!text-white'));
+      btn.classList.add('!bg-ink', '!text-white');
+      selectedDuration = btn.dataset.duration!;
+      if (selectedDuration === 'custom') {
+        casCustomDuration.hidden = false;
+        casCustomDuration.focus();
+      } else {
+        casCustomDuration.hidden = true;
+      }
+      updateFinalCas();
+      syncButtons();
+    });
+  });
+
+  casStartInput.addEventListener('input', updateFinalCas);
+  casCustomDuration.addEventListener('input', updateFinalCas);
+
   // Pre-select event type from ?typ= query param
   const typ = new URLSearchParams(location.search).get('typ');
   if (typ) {
@@ -286,10 +464,41 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     inaInput.required = isIna;
     if (!isIna) inaInput.value = '';
   };
+
+  const syncEventType = () => {
+    syncInaAkcia();
+    const isTabor = isTaborSelected();
+    taborCallout.hidden = !isTabor;
+    casStandardWrap.hidden = isTabor;
+    casTaborWrap.hidden = !isTabor;
+    step2Standard.hidden = isTabor;
+    step2Tabor.hidden = !isTabor;
+    step2Label.textContent = isTabor ? 'Údaje dieťaťa' : 'Požiadavky';
+
+    // Hide and disable requirement for Dátum and Počet detí on Pobytový tábor
+    datumWrap.hidden = isTabor;
+    datumInput.required = !isTabor;
+    pocetDetiWrap.hidden = isTabor;
+    pocetDetiSelect.required = !isTabor;
+
+    if (isTabor) {
+      miestoLabel.innerHTML = 'Miesto / Vaša lokalita <span class="text-brand-red" aria-hidden="true">*</span>';
+      miestoInput.placeholder = 'napr. Prešov / Košice (alebo odkiaľ ste)';
+    } else {
+      datumLabel.innerHTML = 'Dátum akcie <span class="text-brand-red" aria-hidden="true">*</span>';
+      datumHint.textContent = 'Rezervácia termínu je možná minimálne 7 dní pred akciou.';
+      miestoLabel.innerHTML = 'Miesto akcie <span class="text-brand-red" aria-hidden="true">*</span>';
+      miestoInput.placeholder = 'mesto, obec alebo adresa';
+      pocetDetiLabel.innerHTML = 'Približný počet detí <span class="text-brand-red" aria-hidden="true">*</span>';
+    }
+    updateFinalCas();
+    syncButtons();
+  };
+
   form.querySelectorAll<HTMLInputElement>('input[name="Typ akcie"]').forEach((r) =>
-    r.addEventListener('change', syncInaAkcia)
+    r.addEventListener('change', syncEventType)
   );
-  syncInaAkcia();
+  syncEventType();
 
   function show(i: number) {
     current = i;
@@ -303,15 +512,60 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   }
 
   function stepValid(i: number) {
+    if (i === 0) {
+      const isTabor = isTaborSelected();
+      if (!isTabor && !casStartInput.value.trim()) {
+        casStartInput.focus();
+        casStartInput.reportValidity();
+        return false;
+      }
+      const fields = steps[0].querySelectorAll<HTMLInputElement>('input[required], select[required]');
+      return [...fields].every((f) => f.reportValidity());
+    }
+    if (i === 1) {
+      if (isTaborSelected()) {
+        if (!taborDetiInput.value.trim()) {
+          taborDetiInput.focus();
+          taborDetiInput.reportValidity();
+          return false;
+        }
+        return true;
+      }
+      return mascotsValid();
+    }
     const fields = steps[i].querySelectorAll<HTMLInputElement>('input, select, textarea');
     return [...fields].every((f) => f.reportValidity());
   }
 
   // Silent validity check (no browser popups) used to enable/disable the buttons
   function stepComplete(i: number) {
-    const fields = steps[i].querySelectorAll<HTMLInputElement>('input, select, textarea');
-    if (![...fields].every((f) => f.checkValidity())) return false;
-    if (i === 1 && maskotiService?.checked && mascotChecks.filter((c) => c.checked).length < 2) return false;
+    if (i === 0) {
+      const typeChecked = !!form.querySelector<HTMLInputElement>('input[name="Typ akcie"]:checked');
+      if (!typeChecked) return false;
+      const inaChecked = form.querySelector<HTMLInputElement>('input[name="Typ akcie"]:checked')?.dataset.typeId === 'ina-akcia';
+      if (inaChecked && !inaInput.value.trim()) return false;
+      const miestoVal = miestoInput.value.trim();
+      if (!miestoVal) return false;
+      if (isTaborSelected()) {
+        return true;
+      }
+      const datumVal = datumInput.value.trim();
+      const pocetVal = pocetDetiSelect.value;
+      if (!datumVal || !pocetVal) return false;
+      if (!casStartInput.value.trim()) return false;
+      return true;
+    }
+    if (i === 1) {
+      if (isTaborSelected()) {
+        return taborDetiInput.value.trim().length > 0;
+      }
+      if (maskotiService?.checked && mascotChecks.filter((c) => c.checked).length < 2) return false;
+      return true;
+    }
+    if (i === 2) {
+      const step3Fields = steps[2].querySelectorAll<HTMLInputElement>('input[required]');
+      return [...step3Fields].every((f) => f.checkValidity());
+    }
     return true;
   }
 
@@ -372,14 +626,14 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
 
   prevBtn.addEventListener('click', () => show(current - 1));
   nextBtn.addEventListener('click', () => {
-    if (stepValid(current) && (current !== 1 || mascotsValid())) show(current + 1);
+    if (stepValid(current)) show(current + 1);
   });
 
   syncButtons();
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!stepValid(current) || !mascotsValid()) return;
+    if (!stepValid(current)) return;
     // Spam guards: filled honeypot or an impossibly fast submission → pretend success
     const honeypot = form.querySelector<HTMLInputElement>('input[name="botcheck"]');
     if (honeypot?.checked || Date.now() - openedAt < MIN_FILL_MS) {
@@ -396,6 +650,22 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
         if (typeof value !== 'string') continue;
         payload[key] = key in payload ? `${payload[key]}, ${value}` : value;
       }
+
+      // Customize payload for Pobytový tábor
+      if (isTaborSelected()) {
+        payload['Dátum'] = 'Letný turnus (1 turnus v roku – potvrdíme e-mailom)';
+        payload['Počet detí'] = 'Podľa registrácie dieťaťa';
+        payload['Služby'] = 'Kompletný táborový program (animátori, maskoti, hry)';
+        const diets = [...form.querySelectorAll<HTMLInputElement>('input[name="tabor_strava"]:checked')].map(c => c.value);
+        const ageInfo = taborDetiInput.value.trim();
+        const healthInfo = taborZdravieInput.value.trim();
+        const notes: string[] = [];
+        if (ageInfo) notes.push(`Meno a vek detí: ${ageInfo}`);
+        if (diets.length) notes.push(`Stravovanie: ${diets.join(', ')}`);
+        if (healthInfo) notes.push(`Zdravie a poznámky: ${healthInfo}`);
+        payload['Iné požiadavky'] = notes.join('\n');
+      }
+
       const res = await fetch(form.action, {
         method: 'POST',
         body: JSON.stringify(payload),

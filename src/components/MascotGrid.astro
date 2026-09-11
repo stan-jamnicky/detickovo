@@ -70,11 +70,81 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   </div>
 </div>
 
-<dialog data-mascot-dialog class="m-auto w-full max-w-2xl rounded-2xl bg-transparent p-0 backdrop:bg-ink/90">
-  <img src="" alt="" class="w-full rounded-2xl" data-mascot-img />
-  <p class="mt-3 text-center font-display text-xl font-bold text-white" data-mascot-caption></p>
-  <div class="mt-3 flex justify-center">
-    <button type="button" data-mascot-close class="btn-light !px-5 !py-2 text-sm">Zavrieť</button>
+<dialog
+  data-mascot-dialog
+  class="hidden open:flex open:flex-col fixed inset-0 m-0 h-dvh w-dvw max-h-none max-w-none border-0 bg-white/95 p-0 text-ink backdrop:bg-white/95 overflow-hidden z-50"
+  aria-label="Detail maskota"
+>
+  <!-- Static Top Bar -->
+  <header class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-ink/10 bg-white/90 px-4 sm:px-6 backdrop-blur-md select-none">
+    <!-- Top left: Mascot name -->
+    <div class="flex items-center min-w-0 pr-3">
+      <h3 class="font-display text-lg sm:text-2xl font-bold text-ink truncate" data-mascot-caption></h3>
+    </div>
+
+    <!-- Top right: Zoom controls + Close button -->
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="flex items-center rounded-full bg-sand/80 p-1 ring-1 ring-ink/10" role="group" aria-label="Ovládanie priblíženia">
+        <button
+          type="button"
+          data-mascot-zoom-out
+          class="flex h-8 w-8 items-center justify-center rounded-full text-ink/70 hover:bg-white hover:text-ink transition cursor-pointer"
+          aria-label="Oddialiť"
+          title="Oddialiť (−)"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+        </button>
+        <button
+          type="button"
+          data-mascot-zoom-reset
+          class="px-2 h-8 text-xs font-mono font-semibold text-ink/80 hover:text-ink transition cursor-pointer rounded-full hover:bg-white/60"
+          aria-label="Obnoviť priblíženie"
+          title="Obnoviť na 100%"
+        >
+          <span data-mascot-zoom-level>100%</span>
+        </button>
+        <button
+          type="button"
+          data-mascot-zoom-in
+          class="flex h-8 w-8 items-center justify-center rounded-full text-ink/70 hover:bg-white hover:text-ink transition cursor-pointer"
+          aria-label="Priblížiť"
+          title="Priblížiť (+)"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        data-mascot-close
+        class="flex h-10 w-10 items-center justify-center rounded-full bg-sand/80 text-ink hover:bg-sand transition cursor-pointer ring-1 ring-ink/10 ml-1"
+        aria-label="Zavrieť detail maskota"
+        title="Zavrieť (Esc)"
+      >
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Image Viewport -->
+  <div
+    class="relative flex-1 w-full h-[calc(100dvh-4rem)] overflow-hidden flex items-center justify-center touch-none select-none bg-cream/40"
+    data-mascot-viewport
+  >
+    <img
+      src=""
+      alt=""
+      class="max-h-[85vh] max-w-[90vw] object-contain pointer-events-none select-none will-change-transform rounded-xl shadow-xl ring-1 ring-ink/5"
+      data-mascot-img
+      draggable="false"
+    />
+
+    <!-- Bottom Helper Hint -->
+    <div class="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-3.5 py-1.5 text-xs text-ink/70 shadow-sm backdrop-blur-md ring-1 ring-ink/10 transition-opacity duration-300">
+      <span>Kolieskom myši alebo gestom prstov priblížite</span>
+    </div>
   </div>
 </dialog>
 
@@ -136,19 +206,210 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   });
 
   const dialog = document.querySelector<HTMLDialogElement>('[data-mascot-dialog]')!;
+  const viewport = dialog.querySelector<HTMLElement>('[data-mascot-viewport]')!;
   const img = dialog.querySelector<HTMLImageElement>('[data-mascot-img]')!;
   const caption = dialog.querySelector<HTMLElement>('[data-mascot-caption]')!;
+  const zoomInBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-in]');
+  const zoomOutBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-out]');
+  const zoomResetBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-reset]');
+  const zoomLevel = dialog.querySelector<HTMLElement>('[data-mascot-zoom-level]');
+  const closeBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-close]');
+
+  let scale = 1;
+  let translateX = 0;
+  let translateY = 0;
+  const MIN_SCALE = 1;
+  const MAX_SCALE = 5;
+
+  const pointers = new Map<number, { x: number; y: number }>();
+  let prevPinchDist = 0;
+  let prevPinchCenter = { x: 0, y: 0 };
+  let isDragging = false;
+  let dragMoved = false;
+
+  function clampAndApply(animate = false) {
+    if (scale <= 1.001) {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+    } else {
+      const vRect = viewport.getBoundingClientRect();
+      const naturalW = img.offsetWidth || vRect.width;
+      const naturalH = img.offsetHeight || vRect.height;
+      const scaledW = naturalW * scale;
+      const scaledH = naturalH * scale;
+
+      const maxPanX = Math.max(0, (scaledW - vRect.width) / 2 + 50);
+      const maxPanY = Math.max(0, (scaledH - vRect.height) / 2 + 50);
+
+      translateX = Math.max(-maxPanX, Math.min(maxPanX, translateX));
+      translateY = Math.max(-maxPanY, Math.min(maxPanY, translateY));
+    }
+
+    if (animate) {
+      img.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+    } else {
+      img.style.transition = 'none';
+    }
+
+    img.style.transform = `translate3d(${Math.round(translateX * 10) / 10}px, ${Math.round(translateY * 10) / 10}px, 0) scale(${scale})`;
+
+    if (zoomLevel) {
+      zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+    }
+    viewport.style.cursor = scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default';
+  }
+
+  function zoomAround(factor: number, clientX?: number, clientY?: number, animate = false) {
+    const vRect = viewport.getBoundingClientRect();
+    const focusX = clientX !== undefined ? clientX - (vRect.left + vRect.width / 2) : 0;
+    const focusY = clientY !== undefined ? clientY - (vRect.top + vRect.height / 2) : 0;
+
+    const targetScale = Math.min(Math.max(MIN_SCALE, scale * factor), MAX_SCALE);
+    if (Math.abs(targetScale - scale) < 0.001) return;
+
+    if (targetScale <= 1) {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+    } else {
+      const pointX = (focusX - translateX) / scale;
+      const pointY = (focusY - translateY) / scale;
+      scale = targetScale;
+      translateX = focusX - pointX * scale;
+      translateY = focusY - pointY * scale;
+    }
+    clampAndApply(animate);
+  }
+
+  function resetZoom(animate = false) {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    clampAndApply(animate);
+  }
+
+  // Mouse wheel scroll to zoom
+  viewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+    zoomAround(zoomFactor, e.clientX, e.clientY, false);
+  }, { passive: false });
+
+  // Pointer events (Pan on PC & Pinch-to-zoom on touch devices)
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    viewport.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    isDragging = true;
+    dragMoved = false;
+
+    if (pointers.size === 2) {
+      const [p1, p2] = Array.from(pointers.values());
+      prevPinchDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      prevPinchCenter = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+    }
+    clampAndApply(false);
+  });
+
+  viewport.addEventListener('pointermove', (e) => {
+    if (!pointers.has(e.pointerId)) return;
+
+    if (pointers.size === 1) {
+      const prev = pointers.get(e.pointerId)!;
+      const dx = e.clientX - prev.x;
+      const dy = e.clientY - prev.y;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        dragMoved = true;
+      }
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (scale > 1) {
+        translateX += dx;
+        translateY += dy;
+        clampAndApply(false);
+      }
+    } else if (pointers.size === 2) {
+      dragMoved = true;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const [p1, p2] = Array.from(pointers.values());
+      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      const center = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+
+      if (prevPinchDist > 0 && dist > 0) {
+        const factor = dist / prevPinchDist;
+        zoomAround(factor, center.x, center.y, false);
+        translateX += center.x - prevPinchCenter.x;
+        translateY += center.y - prevPinchCenter.y;
+        clampAndApply(false);
+      }
+      prevPinchDist = dist;
+      prevPinchCenter = center;
+    }
+  });
+
+  const handlePointerEnd = (e: PointerEvent) => {
+    if (pointers.has(e.pointerId)) {
+      pointers.delete(e.pointerId);
+      try {
+        viewport.releasePointerCapture(e.pointerId);
+      } catch {}
+    }
+    if (pointers.size < 2) {
+      prevPinchDist = 0;
+    }
+    if (pointers.size === 0) {
+      isDragging = false;
+      clampAndApply(true);
+    }
+  };
+
+  viewport.addEventListener('pointerup', handlePointerEnd);
+  viewport.addEventListener('pointercancel', handlePointerEnd);
+
+  // Double click / Double tap to quickly zoom in / reset
+  viewport.addEventListener('dblclick', (e) => {
+    if (scale > 1.1) {
+      resetZoom(true);
+    } else {
+      zoomAround(2.5, e.clientX, e.clientY, true);
+    }
+  });
+
+  // Zoom control buttons
+  zoomInBtn?.addEventListener('click', () => zoomAround(1.35, undefined, undefined, true));
+  zoomOutBtn?.addEventListener('click', () => zoomAround(1 / 1.35, undefined, undefined, true));
+  zoomResetBtn?.addEventListener('click', () => resetZoom(true));
+
+  // Open mascot preview dialog
   document.querySelectorAll<HTMLButtonElement>('[data-mascot-zoom]').forEach((zoom) => {
     zoom.addEventListener('click', () => {
       const card = zoom.closest('[data-mascot-card]')!;
-      img.src = card.querySelector('img')!.src;
+      const mascotImg = card.querySelector('img');
+      if (mascotImg) {
+        img.src = mascotImg.src;
+      }
       img.alt = zoom.dataset.mascotName ?? '';
       caption.textContent = zoom.dataset.mascotName ?? '';
+      resetZoom(false);
       dialog.showModal();
     });
   });
-  dialog.querySelector('[data-mascot-close]')?.addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', (e) => {
-    if (e.target === dialog) dialog.close();
+
+  // Close handlers
+  closeBtn?.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => resetZoom(false));
+
+  // Keyboard controls
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      zoomAround(1.3, undefined, undefined, true);
+    } else if (e.key === '-' || e.key === '_') {
+      e.preventDefault();
+      zoomAround(1 / 1.3, undefined, undefined, true);
+    } else if (e.key === '0') {
+      e.preventDefault();
+      resetZoom(true);
+    }
   });
 </script>
