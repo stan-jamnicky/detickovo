@@ -1,35 +1,39 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import { eventTypeLabel } from '../lib/eventTypes';
+import { getFacebookPostEmbedSrc, getFacebookPostHref } from '../lib/facebook';
+
+export interface EventPost {
+  id?: string;
+  eventType: string;
+  facebookPostUrl: string;
+  facebookEmbedHeight?: number;
+}
 
 interface Props {
-  event: CollectionEntry<'events'>;
+  event: EventPost;
+  index?: number;
 }
-const { event } = Astro.props;
-const { title, cover, location, childrenCount, eventType, services } = event.data;
+const { event, index = 0 } = Astro.props;
+const { facebookPostUrl, facebookEmbedHeight = 560 } = event;
+const facebookHref = getFacebookPostHref(facebookPostUrl);
+const facebookEmbedSrc = getFacebookPostEmbedSrc(facebookPostUrl);
 ---
 
-<a
-  href={`/akcie/${event.id}/`}
-  class="group flex flex-col overflow-hidden rounded-blob bg-white ring-1 ring-ink/5 transition-shadow hover:shadow-xl hover:shadow-ink/10"
->
-  <div class="aspect-[3/2] overflow-hidden">
-    <img
-      src={cover}
-      alt={title}
-      width="1200"
-      height="800"
-      loading="lazy"
-      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-    />
+<article class="relative mx-auto max-w-[350px] overflow-hidden rounded-blob bg-white shadow-lg shadow-ink/5 ring-1 ring-ink/5">
+  <iframe
+    src={facebookEmbedSrc}
+    width="350"
+    height={facebookEmbedHeight}
+    title={`Facebook príspevok ${index + 1}`}
+    style="border:none;overflow:hidden"
+    scrolling="no"
+    frameborder="0"
+    allowfullscreen="true"
+    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+    class="block w-full max-w-full bg-cream"
+    loading="lazy"
+  ></iframe>
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-white/0" aria-hidden="true"></div>
+  <div class="absolute inset-x-0 bottom-0 flex justify-center p-4">
+    <a href={facebookHref} target="_blank" rel="noopener" class="btn-primary !px-5 !py-2.5 text-sm shadow-lg shadow-ink/10">Celý príspevok</a>
   </div>
-  <div class="flex flex-1 flex-col gap-3 p-6">
-    <p class="text-xs font-bold uppercase tracking-widest text-brand-blue">{eventTypeLabel(eventType)}</p>
-    <h3 class="text-xl">{title}</h3>
-    <p class="text-sm text-muted">{location} · {childrenCount} detí</p>
-    <div class="mt-auto flex flex-wrap gap-1.5 pt-2">
-      {services.slice(0, 3).map((s) => <span class="chip !text-xs capitalize">{s.replace(/-/g, ' ')}</span>)}
-      {services.length > 3 && <span class="chip !text-xs">+{services.length - 3}</span>}
-    </div>
-  </div>
-</a>
+</article>

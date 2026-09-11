@@ -1,0 +1,107 @@
+---
+import Base from '../../layouts/Base.astro';
+import { isAdminAuthenticated, isAdminConfigured } from '../../lib/adminAuth';
+import { listEventPosts } from '../../lib/eventPosts';
+import { EVENT_TYPES, eventTypeLabel } from '../../lib/eventTypes';
+
+export const prerender = false;
+
+const authenticated = isAdminAuthenticated(Astro.cookies);
+const configured = isAdminConfigured();
+const events = authenticated ? await listEventPosts() : [];
+---
+
+<Base title="Administrácia akcií – Detičkovo" description="Správa Facebook príspevkov pre akcie Detičkova.">
+  <section class="bg-cream">
+    <div class="container-site py-14 sm:py-20">
+      <span class="kicker">Administrácia</span>
+      <h1 class="max-w-2xl text-4xl sm:text-6xl">Facebook akcie</h1>
+      <p class="mt-4 max-w-xl text-muted">Pridajte Facebook príspevok, vyberte typ akcie a web ho začne zobrazovať v zozname akcií.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container-site">
+      {!configured ? (
+        <div class="max-w-xl rounded-blob bg-cream p-6 ring-1 ring-ink/5">
+          <h2 class="text-2xl">Chýba admin heslo</h2>
+          <p class="mt-2 text-muted">Nastavte `ADMIN_SECRET` v `.env.local` a vo Vercel environment variables. Potom reštartujte dev server.</p>
+        </div>
+      ) : !authenticated ? (
+        <form method="post" action="/api/admin/login" class="max-w-md rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5">
+          <label class="block text-sm font-bold" for="password">Heslo</label>
+          <input id="password" name="password" type="password" required class="mt-2 w-full rounded-2xl bg-cream px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" />
+          <button type="submit" class="btn-primary mt-5">Prihlásiť sa</button>
+        </form>
+      ) : (
+        <div class="grid gap-8 lg:grid-cols-[24rem_1fr]">
+          <aside>
+            <form method="post" action="/api/admin/events" class="rounded-blob bg-cream p-6 ring-1 ring-ink/5">
+              <input type="hidden" name="action" value="create" />
+              <h2 class="text-2xl">Nová akcia</h2>
+
+              <label class="mt-5 block text-sm font-bold" for="eventType">Typ akcie</label>
+              <select id="eventType" name="eventType" required class="mt-2 w-full rounded-2xl bg-white px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue">
+                {EVENT_TYPES.map((type) => <option value={type.id}>{type.label}</option>)}
+              </select>
+
+              <label class="mt-5 block text-sm font-bold" for="facebookPostUrl">Facebook príspevok</label>
+              <textarea id="facebookPostUrl" name="facebookPostUrl" required rows="5" class="mt-2 w-full rounded-2xl bg-white px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" placeholder="https://www.facebook.com/plugins/post.php?href=..."></textarea>
+
+              <label class="mt-5 block text-sm font-bold" for="facebookEmbedHeight">Výška karty</label>
+              <input id="facebookEmbedHeight" name="facebookEmbedHeight" type="number" min="320" max="1200" value="560" class="mt-2 w-full rounded-2xl bg-white px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" />
+
+              <button type="submit" class="btn-primary mt-6 w-full">Pridať akciu</button>
+            </form>
+
+            <form method="post" action="/api/admin/logout" class="mt-4">
+              <button type="submit" class="btn-secondary w-full">Odhlásiť sa</button>
+            </form>
+          </aside>
+
+          <div class="space-y-5">
+            {events.length === 0 ? (
+              <p class="rounded-blob bg-cream p-6 text-muted">Zatiaľ nie sú pridané žiadne Facebook akcie.</p>
+            ) : (
+              events.map((event) => (
+                <form method="post" action="/api/admin/events" class="rounded-blob bg-white p-5 shadow-lg shadow-ink/5 ring-1 ring-ink/5">
+                  <input type="hidden" name="id" value={event.id} />
+                  <div class="grid gap-4 lg:grid-cols-[12rem_1fr_8rem]">
+                    <div>
+                      <label class="block text-xs font-bold uppercase tracking-widest text-brand-blue">Typ</label>
+                      <select name="eventType" required class="mt-2 w-full rounded-2xl bg-cream px-3 py-2 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" aria-label={`Typ akcie ${eventTypeLabel(event.eventType)}`}>
+                        {EVENT_TYPES.map((type) => <option value={type.id} selected={type.id === event.eventType}>{type.label}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold uppercase tracking-widest text-brand-blue">Facebook príspevok</label>
+                      <textarea name="facebookPostUrl" required rows="3" class="mt-2 w-full rounded-2xl bg-cream px-3 py-2 outline-none ring-1 ring-ink/10 focus:ring-brand-blue">{event.facebookPostUrl}</textarea>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold uppercase tracking-widest text-brand-blue">Výška</label>
+                      <input name="facebookEmbedHeight" type="number" min="320" max="1200" value={event.facebookEmbedHeight} class="mt-2 w-full rounded-2xl bg-cream px-3 py-2 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" />
+                    </div>
+                  </div>
+                  <div class="mt-4 flex flex-wrap gap-3">
+                    <button type="submit" name="action" value="update" class="btn-primary !px-5 !py-2.5 text-sm">Uložiť</button>
+                    <button type="submit" name="action" value="delete" class="btn-secondary !px-5 !py-2.5 text-sm" data-confirm-delete>Zmazať</button>
+                  </div>
+                </form>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-confirm-delete]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      if (!confirm('Naozaj chcete zmazat tuto akciu?')) {
+        event.preventDefault();
+      }
+    });
+  });
+</script>

@@ -8,9 +8,11 @@ import EventCard from '../components/EventCard.astro';
 import StatBand from '../components/StatBand.astro';
 import ReferenceRow from '../components/ReferenceRow.astro';
 import CTASection from '../components/CTASection.astro';
+import { listEventPosts } from '../lib/eventPosts';
 
-const events = (await getCollection('events')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const recent = events;
+export const prerender = false;
+
+const recent = await listEventPosts(6);
 const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order).slice(0, 6);
 ---
 
@@ -153,9 +155,9 @@ const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.orde
           id="events-track"
           class="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {recent.map((event) => (
+          {recent.map((event, index) => (
             <div class="w-[86%] shrink-0 snap-start sm:w-[47%] lg:w-[calc((100%-3rem)/3)]">
-              <EventCard event={event} />
+              <EventCard event={event} index={index} />
             </div>
           ))}
         </div>
