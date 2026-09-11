@@ -1,16 +1,8 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ServiceGrid from '../components/ServiceGrid.astro';
-import EventCard from '../components/EventCard.astro';
 import ReferenceRow from '../components/ReferenceRow.astro';
 import CTASection from '../components/CTASection.astro';
-
-const largeTypes = ['mesto-obec', 'skola-skolka', 'firma', 'festival'];
-const events = (await getCollection('events'))
-  .filter((e) => largeTypes.includes(e.data.eventType))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
 
 const scenarios = [
   { title: 'Deň detí pre mesto či obec', text: 'Kompletné popoludnie so stanovišťami, súťažami, maskotmi a moderovaním – pre 100 až 1000 detí.', color: 'bg-brand-blue' },
@@ -92,10 +84,7 @@ const steps = [
     <div class="container-site">
       <span class="kicker">Nechajte sa inšpirovať</span>
       <h2 class="max-w-xl text-3xl sm:text-4xl">Takto vyzerajú naše veľké akcie</h2>
-      <div class="mt-10 grid gap-6 md:grid-cols-3">
-        {events.map((event) => <EventCard event={event} />)}
-      </div>
-      <div class="mt-10 flex flex-wrap justify-center gap-3">
+      <div class="mt-8 flex flex-wrap gap-3">
         <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
         <a href="/akcie" class="btn-secondary">Naše akcie</a>
       </div>

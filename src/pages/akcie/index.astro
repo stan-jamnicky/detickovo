@@ -1,12 +1,14 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import EventCard from '../../components/EventCard.astro';
 import CTASection from '../../components/CTASection.astro';
 import { EVENT_TYPES } from '../../lib/eventTypes';
+import { listEventPosts } from '../../lib/eventPosts';
 
-const events = (await getCollection('events')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const usedTypes = EVENT_TYPES.filter((t) => events.some((e) => e.data.eventType === t.id));
+export const prerender = false;
+
+const events = await listEventPosts();
+const usedTypes = EVENT_TYPES.filter((type) => events.some((event) => event.eventType === type.id));
 ---
 
 <Base
@@ -17,7 +19,7 @@ const usedTypes = EVENT_TYPES.filter((t) => events.some((e) => e.data.eventType 
     <div class="container-site py-16 sm:py-20">
       <span class="kicker">Príbehy z akcií</span>
       <h1 class="max-w-2xl text-4xl sm:text-6xl">Akcie, na ktorých sme zabávali</h1>
-      <p class="mt-4 max-w-xl text-muted">Každá akcia je iná. Pozrite si, čo sme pripravili pre mestá, školy, firmy aj rodiny.</p>
+      <p class="mt-4 max-w-xl text-muted">Najnovšie príspevky z nášho Facebooku, priamo na jednom mieste.</p>
     </div>
   </section>
 
@@ -25,14 +27,14 @@ const usedTypes = EVENT_TYPES.filter((t) => events.some((e) => e.data.eventType 
     <div class="container-site">
       <div class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter podľa typu akcie">
         <button type="button" class="chip !bg-ink !text-white" data-filter="all">Všetky</button>
-        {usedTypes.map((t) => (
-          <button type="button" class="chip hover:bg-ink/10" data-filter={t.id}>{t.label}</button>
+        {usedTypes.map((type) => (
+          <button type="button" class="chip hover:bg-ink/10" data-filter={type.id}>{type.label}</button>
         ))}
       </div>
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {events.map((event) => (
-          <div data-event-type={event.data.eventType}>
-            <EventCard event={event} />
+        {events.map((event, index) => (
+          <div data-event-type={event.eventType}>
+            <EventCard event={event} index={index} />
           </div>
         ))}
       </div>
@@ -45,11 +47,13 @@ const usedTypes = EVENT_TYPES.filter((t) => events.some((e) => e.data.eventType 
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
   const cards = document.querySelectorAll<HTMLElement>('[data-event-type]');
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      buttons.forEach((b) => b.classList.remove('!bg-ink', '!text-white'));
-      btn.classList.add('!bg-ink', '!text-white');
-      const filter = btn.dataset.filter;
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      buttons.forEach((item) => item.classList.remove('!bg-ink', '!text-white'));
+      button.classList.add('!bg-ink', '!text-white');
+
+      const filter = button.dataset.filter;
       cards.forEach((card) => {
         card.style.display = filter === 'all' || card.dataset.eventType === filter ? '' : 'none';
       });
