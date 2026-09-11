@@ -1,0 +1,540 @@
+---
+import Base from '../../layouts/Base.astro';
+import { isAdminAuthenticated, isAdminConfigured } from '../../lib/adminAuth';
+import { filterEventPosts } from '../../lib/eventPosts';
+import { getFacebookPostEmbedSrc, getFacebookPostHref } from '../../lib/facebook';
+import { EVENT_TYPES, eventTypeLabel } from '../../lib/eventTypes';
+
+export const prerender = false;
+
+const authenticated = isAdminAuthenticated(Astro.cookies);
+const configured = isAdminConfigured();
+
+const typeFilter = Astro.url.searchParams.get('typ') ?? '';
+const fromFilter = Astro.url.searchParams.get('od') ?? '';
+const toFilter = Astro.url.searchParams.get('do') ?? '';
+
+const createdFrom = fromFilter ? new Date(`${fromFilter}T00:00:00`) : undefined;
+const createdTo = toFilter ? new Date(`${toFilter}T23:59:59.999`) : undefined;
+const hasFilters = Boolean(typeFilter || fromFilter || toFilter);
+
+const events = authenticated
+  ? await filterEventPosts({
+      eventType: typeFilter || undefined,
+      createdFrom: Number.isNaN(createdFrom?.getTime()) ? undefined : createdFrom,
+      createdTo: Number.isNaN(createdTo?.getTime()) ? undefined : createdTo,
+    })
+  : [];
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
+
+const shortenUrl = (value: string) => {
+  const href = getFacebookPostHref(value);
+  return href.length > 60 ? `${href.slice(0, 60)}…` : href;
+};
+---
+
+<Base title="Administrácia akcií – Detičkovo" description="Správa Facebook príspevkov pre akcie Detičkova.">
+  <section class="bg-cream">
+    <div class="mx-auto w-full max-w-[96rem] px-5 py-14 sm:px-8 sm:py-20">
+      <span class="kicker">Administrácia</span>
+      <h1 class="max-w-2xl text-4xl sm:text-6xl">Facebook akcie</h1>
+      <p class="mt-4 max-w-xl text-muted">Pridajte Facebook príspevok, vyberte typ akcie a web ho začne zobrazovať v zozname akcií.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="mx-auto w-full max-w-[96rem] px-5 sm:px-8">
+      {!configured ? (
+        <div class="max-w-xl rounded-blob bg-cream p-6 ring-1 ring-ink/5">
+          <h2 class="text-2xl">Chýba admin heslo</h2>
+          <p class="mt-2 text-muted">Nastavte `ADMIN_SECRET` v `.env.local` a vo Vercel environment variables. Potom reštartujte dev server.</p>
+        </div>
+      ) : !authenticated ? (
+        <form method="post" action="/api/admin/login" class="max-w-md rounded-blob bg-white p-6 shadow-lg shadow-ink/5 ring-1 ring-ink/5">
+          <label class="block text-sm font-bold" for="password">Heslo</label>
+          <input id="password" name="password" type="password" required class="mt-2 w-full rounded-2xl bg-cream px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" />
+          <button type="submit" class="btn-primary mt-5">Prihlásiť sa</button>
+        </form>
+      ) : (
+        <div>
+          <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="kicker">Uložené príspevky</span>
+              <h2 class="text-3xl sm:text-4xl">{events.length} {events.length === 1 ? 'akcia' : events.length < 5 && events.length > 0 ? 'akcie' : 'akcií'}</h2>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <a href="/akcie" class="btn-secondary !px-5 !py-2.5 text-sm">Otvoriť /akcie</a>
+              <button type="button" class="btn-primary !px-5 !py-2.5 text-sm" data-open-create>+ Pridať akciu</button>
+              <form method="post" action="/api/admin/logout">
+                <button type="submit" class="btn-secondary !px-5 !py-2.5 text-sm">Odhlásiť sa</button>
+              </form>
+            </div>
+          </div>
+
+          <form method="get" class="mb-6 flex flex-wrap items-end gap-3 rounded-blob bg-cream p-4 ring-1 ring-ink/5">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-widest text-muted" for="filter-typ">Typ akcie</label>
+              <select id="filter-typ" name="typ" class="mt-1.5 rounded-2xl bg-white px-4 py-2.5 text-sm outline-none ring-1 ring-ink/10 focus:ring-brand-blue">
+                <option value="">Všetky typy</option>
+                {EVENT_TYPES.map((type) => <option value={type.id} selected={type.id === typeFilter}>{type.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-widest text-muted" for="filter-od">Pridané od</label>
+              <input id="filter-od" type="date" name="od" value={fromFilter} class="mt-1.5 rounded-2xl bg-white px-4 py-2.5 text-sm outline-none ring-1 ring-ink/10 focus:ring-brand-blue" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-widest text-muted" for="filter-do">Pridané do</label>
+              <input id="filter-do" type="date" name="do" value={toFilter} class="mt-1.5 rounded-2xl bg-white px-4 py-2.5 text-sm outline-none ring-1 ring-ink/10 focus:ring-brand-blue" />
+            </div>
+            <button type="submit" class="btn-primary !px-5 !py-2.5 text-sm">Filtrovať</button>
+            {hasFilters && <a href="/admin/akcie" class="btn-secondary !px-5 !py-2.5 text-sm">Zrušiť filtre</a>}
+          </form>
+
+          <form method="post" action="/api/admin/events" data-bulk-form>
+            <input type="hidden" name="action" value="bulk-delete" />
+            <div class="mb-4 hidden items-center gap-4 rounded-2xl bg-ink px-5 py-3 text-white" data-bulk-bar>
+              <span class="text-sm font-bold" data-bulk-count>0 vybraných</span>
+              <button type="submit" class="btn !bg-brand-red !px-4 !py-2 text-sm !text-white hover:!bg-brand-red/80" data-bulk-delete>Zmazať vybrané</button>
+              <button type="button" class="btn !bg-white/10 !px-4 !py-2 text-sm !text-white hover:!bg-white/20" data-bulk-clear>Zrušiť výber</button>
+            </div>
+
+            {events.length === 0 ? (
+              <p class="rounded-blob bg-cream p-8 text-center text-muted">
+                {hasFilters ? 'Žiadne akcie nezodpovedajú filtrom.' : 'Zatiaľ nie sú pridané žiadne Facebook akcie.'}
+              </p>
+            ) : (
+              <div class="overflow-x-auto rounded-blob ring-1 ring-ink/10">
+                {!hasFilters && <p class="border-b border-ink/5 bg-cream/40 px-4 py-2 text-xs text-muted">Poradie zmeníte potiahnutím riadku za úchyt ⠰⠰. Zmeny sa uložia automaticky.</p>}
+                <table class="w-full min-w-[52rem] border-collapse bg-white text-left text-sm">
+                  <thead>
+                    <tr class="border-b border-ink/10 bg-cream/60 text-xs font-bold uppercase tracking-widest text-muted">
+                      <th class="w-12 px-4 py-3">
+                        <input type="checkbox" class="h-4 w-4 accent-brand-blue" data-select-all aria-label="Vybrať všetky" />
+                      </th>
+                      {!hasFilters && <th class="w-12 px-4 py-3"><span class="sr-only">Poradie</span></th>}
+                      <th class="px-4 py-3">Typ</th>
+                      <th class="px-4 py-3">Facebook príspevok</th>
+                      <th class="px-4 py-3">Výška</th>
+                      <th class="px-4 py-3">Pridané</th>
+                      <th class="px-4 py-3 text-right">Akcie</th>
+                    </tr>
+                  </thead>
+                  <tbody data-sortable={!hasFilters ? '' : undefined}>
+                    {events.map((event) => (
+                      <tr data-row-id={event.id} class="border-b border-ink/5 bg-white transition-colors last:border-0 hover:bg-cream/40">
+                        <td class="px-4 py-3">
+                          <input type="checkbox" name="ids" value={event.id} class="h-4 w-4 accent-brand-blue" data-row-check aria-label="Vybrať akciu" />
+                        </td>
+                        {!hasFilters && (
+                          <td class="px-4 py-3">
+                            <span class="cursor-grab select-none text-lg text-muted transition-colors hover:text-ink active:cursor-grabbing" data-drag-handle aria-label="Potiahnutím zmeňte poradie">⠰⠰</span>
+                          </td>
+                        )}
+                        <td class="px-4 py-3"><span class="chip !text-xs">{eventTypeLabel(event.eventType)}</span></td>
+                        <td class="max-w-[24rem] px-4 py-3">
+                          <a
+                            href={getFacebookPostHref(event.facebookPostUrl)}
+                            target="_blank"
+                            rel="noopener"
+                            class="block truncate font-medium text-brand-blue-dark hover:underline"
+                            data-hover-preview
+                            data-embed-src={getFacebookPostEmbedSrc(event.facebookPostUrl)}
+                            data-embed-height={event.facebookEmbedHeight}
+                          >{shortenUrl(event.facebookPostUrl)}</a>
+                        </td>
+                        <td class="px-4 py-3 text-muted">{event.facebookEmbedHeight} px</td>
+                        <td class="px-4 py-3 text-muted">{formatDate(event.createdAt)}</td>
+                        <td class="px-4 py-3">
+                          <div class="flex justify-end gap-2">
+                            <button
+                              type="button"
+                              class="btn-secondary !px-3 !py-1.5 text-xs"
+                              data-open-preview
+                              data-embed-src={getFacebookPostEmbedSrc(event.facebookPostUrl)}
+                              data-embed-height={event.facebookEmbedHeight}
+                            >Náhľad</button>
+                            <button
+                              type="button"
+                              class="btn-secondary !px-3 !py-1.5 text-xs"
+                              data-open-edit
+                              data-id={event.id}
+                              data-event-type={event.eventType}
+                              data-url={event.facebookPostUrl}
+                              data-height={event.facebookEmbedHeight}
+                            >✎ Upraviť</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </form>
+
+          <dialog data-editor-dialog class="m-auto w-[min(40rem,calc(100%-2rem))] rounded-blob bg-white p-0 shadow-2xl shadow-ink/20 backdrop:bg-ink/50">
+            <form method="post" action="/api/admin/events" class="p-6 sm:p-8" data-preview-scope>
+              <input type="hidden" name="action" value="create" data-editor-action />
+              <input type="hidden" name="id" value="" data-editor-id />
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <span class="kicker" data-editor-kicker>Nová akcia</span>
+                  <h2 class="text-3xl">Facebook príspevok</h2>
+                </div>
+                <button type="button" class="btn-secondary !px-4 !py-2 text-sm" data-dialog-close>Zavrieť</button>
+              </div>
+
+              <label class="mt-6 block text-sm font-bold" for="editor-typ">Typ akcie</label>
+              <select id="editor-typ" name="eventType" required class="mt-2 w-full rounded-2xl bg-cream px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue">
+                {EVENT_TYPES.map((type) => <option value={type.id}>{type.label}</option>)}
+              </select>
+
+              <label class="mt-5 block text-sm font-bold" for="editor-url">Facebook príspevok</label>
+              <textarea id="editor-url" name="facebookPostUrl" required rows="4" class="mt-2 w-full rounded-2xl bg-cream px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" placeholder="https://www.facebook.com/plugins/post.php?href=..."></textarea>
+              <p class="mt-2 hidden text-sm font-medium text-brand-red" data-preview-error>Vložte platný Facebook príspevok alebo plugin URL.</p>
+
+              <label class="mt-5 block text-sm font-bold" for="editor-height">Výška karty</label>
+              <input id="editor-height" name="facebookEmbedHeight" type="number" min="320" max="1200" value="550" class="mt-2 w-full rounded-2xl bg-cream px-4 py-3 outline-none ring-1 ring-ink/10 focus:ring-brand-blue" />
+
+              <div class="mt-6">
+                <div class="mb-3 flex items-center justify-between gap-3">
+                  <h3 class="text-lg">Náhľad</h3>
+                  <span class="text-xs font-bold uppercase tracking-widest text-muted">Live</span>
+                </div>
+                <div class="mx-auto w-full max-w-[350px] rounded-blob bg-cream p-2 ring-1 ring-ink/5">
+                  <p class="px-2 py-8 text-center text-sm text-muted" data-preview-empty>Vložte Facebook URL a náhľad sa zobrazí tu.</p>
+                  <iframe
+                    title="Náhľad Facebook príspevku"
+                    width="350"
+                    height="550"
+                    style="border:none;overflow:hidden"
+                    scrolling="no"
+                    frameborder="0"
+                    allowfullscreen="true"
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    class="hidden w-full max-w-full rounded-2xl bg-white"
+                    data-preview-frame
+                  ></iframe>
+                </div>
+              </div>
+
+              <div class="mt-6 flex flex-wrap gap-3">
+                <button type="submit" name="position" value="top" class="btn-primary !px-5 !py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50" data-save-button data-editor-save>Pridať na začiatok</button>
+                <button type="submit" name="position" value="bottom" class="btn-secondary !px-5 !py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50" data-save-button data-editor-save-end>Pridať na koniec</button>
+                <button type="submit" name="action" value="delete" class="hidden btn-secondary !px-5 !py-2.5 text-sm !text-brand-red" data-confirm-delete data-editor-delete>Zmazať</button>
+              </div>
+            </form>
+          </dialog>
+
+          <dialog data-preview-dialog class="m-auto w-[min(26rem,calc(100%-2rem))] rounded-blob bg-white p-0 shadow-2xl shadow-ink/20 backdrop:bg-ink/50">
+            <div class="p-5">
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <h2 class="text-xl">Náhľad príspevku</h2>
+                <button type="button" class="btn-secondary !px-4 !py-2 text-sm" data-dialog-close>Zavrieť</button>
+              </div>
+              <iframe
+                title="Náhľad uloženého Facebook príspevku"
+                width="350"
+                height="550"
+                style="border:none;overflow:hidden"
+                scrolling="no"
+                frameborder="0"
+                allowfullscreen="true"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                class="mx-auto block w-full max-w-[350px] rounded-2xl bg-cream"
+                data-preview-target
+              ></iframe>
+            </div>
+          </dialog>
+
+          <div class="pointer-events-none fixed z-50 hidden w-[366px] rounded-2xl bg-white p-2 shadow-2xl shadow-ink/20 ring-1 ring-ink/10" data-hover-popover>
+            <iframe
+              title="Rýchly náhľad Facebook príspevku"
+              width="350"
+              height="550"
+              style="border:none;overflow:hidden"
+              scrolling="no"
+              frameborder="0"
+              class="block w-full rounded-xl bg-cream"
+              data-hover-popover-frame
+            ></iframe>
+          </div>
+
+          <div class="fixed bottom-6 left-1/2 z-50 hidden -translate-x-1/2 rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-white shadow-2xl shadow-ink/30" role="status" data-toast></div>
+        </div>
+      )}
+    </div>
+  </section>
+</Base>
+
+<script>
+  import Sortable from 'sortablejs';
+
+  const parseFacebookPostUrl = (value: string): string | null => {
+    const rawUrl = value.trim().replaceAll('&amp;', '&');
+    const iframeSrc = rawUrl.match(/<iframe[^>]+src=["']([^"']+)/i)?.[1] ?? rawUrl;
+
+    try {
+      const url = new URL(iframeSrc);
+
+      if (!(url.hostname === 'facebook.com' || url.hostname.endsWith('.facebook.com'))) return null;
+
+      if (url.pathname === '/plugins/post.php') {
+        const href = url.searchParams.get('href');
+        return href ? parseFacebookPostUrl(href) : null;
+      }
+
+      if (url.pathname.includes('/posts/') || url.pathname === '/permalink.php' || url.searchParams.has('story_fbid')) {
+        const href = url.toString();
+        return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(href)}&show_text=true&width=350`;
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-preview-scope]').forEach((scope) => {
+    const urlField = scope.querySelector<HTMLTextAreaElement>('[name="facebookPostUrl"]');
+    const heightField = scope.querySelector<HTMLInputElement>('[name="facebookEmbedHeight"]');
+    const frame = scope.querySelector<HTMLIFrameElement>('[data-preview-frame]');
+    const empty = scope.querySelector<HTMLElement>('[data-preview-empty]');
+    const error = scope.querySelector<HTMLElement>('[data-preview-error]');
+    const saveButtons = [...scope.querySelectorAll<HTMLButtonElement>('[data-save-button]')];
+    const setSaveDisabled = (disabled: boolean) => saveButtons.forEach((button) => { button.disabled = disabled; });
+
+    const updatePreview = () => {
+      if (!urlField || !heightField || !frame) return;
+
+      const value = urlField.value.trim();
+      const height = Math.max(320, Math.min(1200, Number(heightField.value) || 550));
+
+      frame.height = String(height);
+      frame.style.height = `${height}px`;
+
+      if (!value) {
+        frame.classList.add('hidden');
+        empty?.classList.remove('hidden');
+        error?.classList.add('hidden');
+        setSaveDisabled(true);
+        frame.removeAttribute('src');
+        return;
+      }
+
+      const nextSrc = parseFacebookPostUrl(value);
+      if (!nextSrc) {
+        frame.classList.add('hidden');
+        empty?.classList.add('hidden');
+        error?.classList.remove('hidden');
+        setSaveDisabled(true);
+        frame.removeAttribute('src');
+        return;
+      }
+
+      if (frame.src !== nextSrc) frame.src = nextSrc;
+      frame.classList.remove('hidden');
+      empty?.classList.add('hidden');
+      error?.classList.add('hidden');
+      setSaveDisabled(false);
+    };
+
+    urlField?.addEventListener('input', updatePreview);
+    heightField?.addEventListener('input', updatePreview);
+    updatePreview();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-dialog-close]').forEach((button) => {
+    button.addEventListener('click', () => {
+      button.closest('dialog')?.close();
+    });
+  });
+
+  // Shared create/edit dialog
+  const editorDialog = document.querySelector<HTMLDialogElement>('[data-editor-dialog]');
+  const editorForm = editorDialog?.querySelector('form');
+  const editorAction = editorDialog?.querySelector<HTMLInputElement>('[data-editor-action]');
+  const editorId = editorDialog?.querySelector<HTMLInputElement>('[data-editor-id]');
+  const editorKicker = editorDialog?.querySelector<HTMLElement>('[data-editor-kicker]');
+  const editorSave = editorDialog?.querySelector<HTMLButtonElement>('[data-editor-save]');
+  const editorSaveEnd = editorDialog?.querySelector<HTMLButtonElement>('[data-editor-save-end]');
+  const editorDelete = editorDialog?.querySelector<HTMLButtonElement>('[data-editor-delete]');
+
+  const openEditor = (mode: 'create' | 'edit', data?: { id: string; eventType: string; url: string; height: string }) => {
+    if (!editorDialog || !editorForm || !editorAction || !editorId) return;
+
+    editorAction.value = mode === 'create' ? 'create' : 'update';
+    editorId.value = data?.id ?? '';
+    if (editorKicker) editorKicker.textContent = mode === 'create' ? 'Nová akcia' : 'Upraviť akciu';
+    if (editorSave) editorSave.textContent = mode === 'create' ? 'Pridať na začiatok' : 'Uložiť zmeny';
+    editorSaveEnd?.classList.toggle('hidden', mode === 'edit');
+    editorDelete?.classList.toggle('hidden', mode === 'create');
+
+    const typeField = editorForm.querySelector<HTMLSelectElement>('[name="eventType"]');
+    const urlField = editorForm.querySelector<HTMLTextAreaElement>('[name="facebookPostUrl"]');
+    const heightField = editorForm.querySelector<HTMLInputElement>('[name="facebookEmbedHeight"]');
+
+    if (typeField) typeField.value = data?.eventType ?? typeField.options[0]?.value ?? '';
+    if (urlField) urlField.value = data?.url ?? '';
+    if (heightField) heightField.value = data?.height ?? '550';
+
+    urlField?.dispatchEvent(new Event('input'));
+    editorDialog.showModal();
+  };
+
+  document.querySelector<HTMLButtonElement>('[data-open-create]')?.addEventListener('click', () => openEditor('create'));
+
+  document.querySelectorAll<HTMLButtonElement>('[data-open-edit]').forEach((button) => {
+    button.addEventListener('click', () => {
+      openEditor('edit', {
+        id: button.dataset.id ?? '',
+        eventType: button.dataset.eventType ?? '',
+        url: button.dataset.url ?? '',
+        height: button.dataset.height ?? '550',
+      });
+    });
+  });
+
+  // On-demand row preview
+  const previewDialog = document.querySelector<HTMLDialogElement>('[data-preview-dialog]');
+  const previewTarget = previewDialog?.querySelector<HTMLIFrameElement>('[data-preview-target]');
+
+  document.querySelectorAll<HTMLButtonElement>('[data-open-preview]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!previewDialog || !previewTarget) return;
+      const height = Math.max(320, Math.min(1200, Number(button.dataset.embedHeight) || 550));
+      previewTarget.height = String(height);
+      previewTarget.style.height = `${height}px`;
+      previewTarget.src = button.dataset.embedSrc ?? '';
+      previewDialog.showModal();
+    });
+  });
+
+  previewDialog?.addEventListener('close', () => {
+    previewTarget?.removeAttribute('src');
+  });
+
+  // Bulk selection
+  const bulkBar = document.querySelector<HTMLElement>('[data-bulk-bar]');
+  const bulkCount = document.querySelector<HTMLElement>('[data-bulk-count]');
+  const selectAll = document.querySelector<HTMLInputElement>('[data-select-all]');
+  const rowChecks = [...document.querySelectorAll<HTMLInputElement>('[data-row-check]')];
+
+  const updateBulkBar = () => {
+    const selected = rowChecks.filter((check) => check.checked).length;
+    bulkBar?.classList.toggle('hidden', selected === 0);
+    bulkBar?.classList.toggle('flex', selected > 0);
+    if (bulkCount) bulkCount.textContent = `${selected} ${selected === 1 ? 'vybraná' : selected < 5 ? 'vybrané' : 'vybraných'}`;
+    if (selectAll) {
+      selectAll.checked = selected > 0 && selected === rowChecks.length;
+      selectAll.indeterminate = selected > 0 && selected < rowChecks.length;
+    }
+  };
+
+  selectAll?.addEventListener('change', () => {
+    rowChecks.forEach((check) => {
+      check.checked = selectAll.checked;
+    });
+    updateBulkBar();
+  });
+
+  rowChecks.forEach((check) => check.addEventListener('change', updateBulkBar));
+
+  // Drag & drop ordering — persists via fetch, no page reload
+  const toast = document.querySelector<HTMLElement>('[data-toast]');
+  let toastTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const showToast = (message: string) => {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.add('hidden'), 2500);
+  };
+
+  const sortableBody = document.querySelector<HTMLElement>('[data-sortable]');
+  if (sortableBody) {
+    new Sortable(sortableBody, {
+      handle: '[data-drag-handle]',
+      animation: 200,
+      forceFallback: true,
+      ghostClass: 'opacity-40',
+      chosenClass: '!bg-cream',
+      onEnd: async () => {
+        const ids = [...sortableBody.querySelectorAll<HTMLElement>('[data-row-id]')].map((row) => row.dataset.rowId ?? '');
+        const body = new FormData();
+        body.set('action', 'reorder');
+        ids.forEach((id) => body.append('ids', id));
+
+        try {
+          const response = await fetch('/api/admin/events', { method: 'post', body });
+          if (!response.ok) throw new Error();
+          showToast('Poradie uložené ✓');
+        } catch {
+          showToast('Poradie sa nepodarilo uložiť');
+        }
+      },
+    });
+  }
+
+  // Hover preview on URL (desktop); Náhľad button stays for touch devices
+  const popover = document.querySelector<HTMLElement>('[data-hover-popover]');
+  const popoverFrame = popover?.querySelector<HTMLIFrameElement>('[data-hover-popover-frame]');
+  let hoverTimer: ReturnType<typeof setTimeout> | undefined;
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-hover-preview]').forEach((link) => {
+    link.addEventListener('mouseenter', () => {
+      if (!popover || !popoverFrame) return;
+      hoverTimer = setTimeout(() => {
+        const rect = link.getBoundingClientRect();
+        const height = Math.max(320, Math.min(1200, Number(link.dataset.embedHeight) || 550));
+        const popoverHeight = height + 16;
+
+        popoverFrame.height = String(height);
+        popoverFrame.style.height = `${height}px`;
+
+        // To the right of the URL so rows below stay readable; clamp to viewport
+        const left = Math.min(rect.right + 12, window.innerWidth - 366 - 8);
+        const top = Math.max(8, Math.min(rect.top, window.innerHeight - popoverHeight - 8));
+        popover.style.top = `${top}px`;
+        popover.style.left = `${left}px`;
+        popoverFrame.src = link.dataset.embedSrc ?? '';
+        popover.classList.remove('hidden');
+      }, 350);
+    });
+
+    link.addEventListener('mouseleave', () => {
+      clearTimeout(hoverTimer);
+      popover?.classList.add('hidden');
+      popoverFrame?.removeAttribute('src');
+    });
+  });
+
+  document.querySelector<HTMLButtonElement>('[data-bulk-delete]')?.addEventListener('click', (event) => {
+    const selected = rowChecks.filter((check) => check.checked).length;
+    if (!confirm(`Naozaj chcete zmazať ${selected} ${selected === 1 ? 'akciu' : selected < 5 ? 'akcie' : 'akcií'}?`)) {
+      event.preventDefault();
+    }
+  });
+
+  document.querySelector<HTMLButtonElement>('[data-bulk-clear]')?.addEventListener('click', () => {
+    rowChecks.forEach((check) => {
+      check.checked = false;
+    });
+    updateBulkBar();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-confirm-delete]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      if (!confirm('Naozaj chcete zmazat tuto akciu?')) {
+        event.preventDefault();
+        return;
+      }
+      // Hidden action input takes precedence over the submit button value
+      if (button === editorDelete && editorAction) editorAction.value = 'delete';
+    });
+  });
+</script>

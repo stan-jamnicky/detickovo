@@ -1,13 +1,6 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import EventCard from '../components/EventCard.astro';
 import CTASection from '../components/CTASection.astro';
-
-const events = (await getCollection('events'))
-  .filter((e) => e.data.eventType === 'svadba')
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
 
 const perks = [
   { icon: '🏕️', title: 'Detský kútik v sále', text: 'Bezpečná zóna s hračkami, kde majú deti vlastný svet.' },
@@ -51,22 +44,6 @@ const perks = [
       </div>
     </div>
   </section>
-
-  {events.length > 0 && (
-    <section class="section bg-cream">
-      <div class="container-site">
-        <span class="kicker">Zo svadieb</span>
-        <h2 class="max-w-xl text-3xl sm:text-4xl">Svadby s Detičkovom</h2>
-        <div class="mt-10 grid gap-6 md:grid-cols-3">
-          {events.map((event) => <EventCard event={event} />)}
-        </div>
-        <div class="mt-10 flex flex-wrap justify-center gap-3">
-          <a href="/objednavka?typ=svadba" class="btn-primary">Overiť dostupnosť termínu</a>
-          <a href="/akcie" class="btn-secondary">Naše akcie</a>
-        </div>
-      </div>
-    </section>
-  )}
 
   <CTASection
     title="Plánujete svadbu s malými hosťami?"
