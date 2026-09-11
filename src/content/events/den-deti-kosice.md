@@ -2,11 +2,23 @@
 title: Deň detí – Košice
 date: 2026-06-01
 location: Mestský park, Košice
-childrenCount: "350+"
+childrenCount: 350+
 eventType: mesto-obec
-services: [maskoti, animatori, hry-a-sutaze, malovanie-na-tvar, bublinova-sou, hudba-zabava]
+services:
+  - maskoti
+  - animatori
+  - hry-a-sutaze
+  - malovanie-na-tvar
+  - bublinova-sou
+  - hudba-zabava
 cover: /uploads/event-den-deti.svg
-gallery: [/uploads/gallery-1.svg, /uploads/gallery-2.svg, /uploads/gallery-3.svg, /uploads/gallery-4.svg]
+gallery:
+  - /uploads/gallery-1.svg
+  - /uploads/gallery-2.svg
+  - /uploads/gallery-3.svg
+  - /uploads/gallery-4.svg
+facebookPostUrl: https://www.facebook.com/detickovocafe.sk/posts/pfbid02JBW5KUwvT2T4EUkpd7piAdKFU7aFSy24L9Ui4kMaxR5Bk9iXwp2o6jFHtEseZnMpl
+facebookEmbedHeight: 700
 featured: true
 testimonial:
   quote: Program bol perfektne zorganizovaný a deti sa nezastavili celé popoludnie. Určite budeme spolupracovať aj budúci rok.
