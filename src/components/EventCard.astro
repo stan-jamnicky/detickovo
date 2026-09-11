@@ -19,21 +19,60 @@ const facebookEmbedSrc = getFacebookPostEmbedSrc(facebookPostUrl);
 ---
 
 <article class="relative mx-auto max-w-[350px] overflow-hidden rounded-blob bg-white shadow-lg shadow-ink/5 ring-1 ring-ink/5">
-  <iframe
-    src={facebookEmbedSrc}
-    width="350"
-    height={facebookEmbedHeight}
-    title={`Facebook príspevok ${index + 1}`}
-    style="border:none;overflow:hidden"
-    scrolling="no"
-    frameborder="0"
-    allowfullscreen="true"
-    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-    class="block w-full max-w-full bg-cream"
-    loading="lazy"
-  ></iframe>
+  <div class="relative">
+    <div class="absolute inset-0 animate-pulse bg-sand" aria-hidden="true" data-embed-placeholder></div>
+    <iframe
+      data-lazy-embed
+      data-src={facebookEmbedSrc}
+      width="350"
+      height={facebookEmbedHeight}
+      title={`Facebook príspevok ${index + 1}`}
+      style="border:none;overflow:hidden"
+      scrolling="no"
+      frameborder="0"
+      allowfullscreen="true"
+      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+      class="relative block w-full max-w-full translate-y-3 opacity-0 transition-all duration-700 ease-out"
+    ></iframe>
+  </div>
   <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-white/0" aria-hidden="true"></div>
   <div class="absolute inset-x-0 bottom-0 flex justify-center p-4">
     <a href={facebookHref} target="_blank" rel="noopener" class="btn-primary !px-5 !py-2.5 text-sm shadow-lg shadow-ink/10">Celý príspevok</a>
   </div>
 </article>
+
+<script>
+  // FB paints progressively and its load event is unreliable, so the embed stays
+  // hidden during a grace period, then fades in — via load event or timer fallback.
+  const reveal = (frame: HTMLIFrameElement) => {
+    let shown = false;
+    const show = () => {
+      if (shown) return;
+      shown = true;
+      frame.classList.remove('opacity-0', 'translate-y-3');
+      frame.parentElement?.querySelector('[data-embed-placeholder]')?.classList.remove('animate-pulse');
+    };
+
+    frame.addEventListener('load', () => setTimeout(show, 450), { once: true });
+    setTimeout(show, 2600);
+    frame.src = frame.dataset.src ?? '';
+  };
+
+  const frames = [...document.querySelectorAll<HTMLIFrameElement>('[data-lazy-embed]:not([src])')];
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          reveal(entry.target as HTMLIFrameElement);
+        });
+      },
+      { rootMargin: '300px 0px' }
+    );
+    frames.forEach((frame) => observer.observe(frame));
+  } else {
+    frames.forEach(reveal);
+  }
+</script>
