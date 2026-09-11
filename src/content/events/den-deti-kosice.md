@@ -17,7 +17,7 @@ gallery:
   - /uploads/gallery-2.svg
   - /uploads/gallery-3.svg
   - /uploads/gallery-4.svg
-facebookPostUrl: https://www.facebook.com/detickovocafe.sk/posts/pfbid02JBW5KUwvT2T4EUkpd7piAdKFU7aFSy24L9Ui4kMaxR5Bk9iXwp2o6jFHtEseZnMpl
+facebookPostUrl: https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fdetickovocafe.sk%2Fposts%2Fpfbid02JBW5KUwvT2T4EUkpd7piAdKFU7aFSy24L9Ui4kMaxR5Bk9iXwp2o6jFHtEseZnMpl
 facebookEmbedHeight: 700
 featured: true
 testimonial:
