@@ -19,6 +19,8 @@ All commands are run from the root of the project, from a terminal:
 
 Facebook event posts are managed at `/admin/akcie`, not in Sveltia CMS. The admin writes directly to MongoDB, so new entries appear on `/akcie` and the homepage without creating Markdown or JSON files.
 
+The default Facebook card height is `550`. Individual posts can override it in the admin when Facebook content is taller or shorter.
+
 Required environment variables:
 
 ```env

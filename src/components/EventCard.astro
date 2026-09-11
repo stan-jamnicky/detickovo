@@ -13,7 +13,7 @@ interface Props {
   index?: number;
 }
 const { event, index = 0 } = Astro.props;
-const { facebookPostUrl, facebookEmbedHeight = 560 } = event;
+const { facebookPostUrl, facebookEmbedHeight = 550 } = event;
 const facebookHref = getFacebookPostHref(facebookPostUrl);
 const facebookEmbedSrc = getFacebookPostEmbedSrc(facebookPostUrl);
 ---
