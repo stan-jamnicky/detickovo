@@ -19,5 +19,6 @@
   document.getElementById('cookie-notice-ok')?.addEventListener('click', () => {
     localStorage.setItem('cookie-notice-dismissed', '1');
     notice.hidden = true;
+    window.dispatchEvent(new CustomEvent('cookie-notice-dismissed'));
   });
 </script>

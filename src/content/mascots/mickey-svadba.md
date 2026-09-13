@@ -1,0 +1,6 @@
+---
+name: Mickey v oblečení na svadbu (Mickey v obleku)
+photo: /uploads/mascot-mickey.svg
+category: disney
+order: 20
+---
