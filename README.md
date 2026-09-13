@@ -38,8 +38,8 @@ Booking requests are handled by the Vercel endpoint at `/api/objednavka`. Set th
 ```env
 PUBLIC_RECAPTCHA_SITE_KEY="XXX"
 RECAPTCHA_SECRET_KEY="..."
-UPSTASH_REDIS_REST_URL="https://..."
-UPSTASH_REDIS_REST_TOKEN="..."
+KV_REST_API_URL="https://..."
+KV_REST_API_TOKEN="..."
 RATE_LIMIT_SALT="a-long-random-secret"
 SMTP_HOST="smtp.forpsi.com"
 SMTP_PORT="465"
