@@ -85,7 +85,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
         </li>
       </ol>
 
-      <form id="inquiry" action="/api/objednavka.php" method="POST" class="space-y-10">
+      <form id="inquiry" action="/api/objednavka" method="POST" class="space-y-10">
         <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
 
         <fieldset data-step="1">
@@ -175,19 +175,12 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 </div>
               </div>
 
-              <!-- Pobytový tábor fixed duration card -->
-              <div id="cas-tabor-wrap" hidden class="rounded-2xl border border-brand-green/25 bg-cream p-4">
-                <span class="block text-xs font-bold uppercase tracking-wider text-brand-green">Dĺžka pobytu</span>
-                <p class="mt-1 font-display font-bold text-ink text-sm">Celotýždňový pobyt (7 dní)</p>
-                <p class="mt-0.5 text-xs text-muted">Kompletný celodenný program počas celého tábora.</p>
-              </div>
-
               <!-- Form-ready submitted field -->
               <input type="hidden" name="Čas" id="cas-final" required value="14:00 (trvanie: 2 hodiny)" />
             </div>
 
             <!-- Miesto -->
-            <label class="block">
+            <label class="block" id="miesto-wrap">
               <span class="mb-1.5 block text-sm font-semibold" id="miesto-label">Miesto akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
               <div class="relative">
                 <input
@@ -291,31 +284,31 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 />
               </label>
 
-              <div class="block">
-                <span class="mb-2 block text-sm font-semibold">Stravovacie požiadavky a diéty</span>
-                <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="group" aria-label="Stravovacie požiadavky">
+              <fieldset class="block">
+                <legend class="mb-2 text-sm font-semibold">Stravovacie požiadavky a diéty <span class="text-brand-red" aria-hidden="true">*</span></legend>
+                <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="radiogroup" aria-label="Stravovacie požiadavky">
                   <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
-                    <input type="checkbox" name="tabor_strava" value="Bežná strava" class="accent-brand-blue" />
+                    <input type="radio" name="tabor_strava" value="Bežná strava" required class="accent-brand-blue" />
                     <span>Bežná strava</span>
                   </label>
                   <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
-                    <input type="checkbox" name="tabor_strava" value="Vegetariánska" class="accent-brand-blue" />
+                    <input type="radio" name="tabor_strava" value="Vegetariánska" class="accent-brand-blue" />
                     <span>Vegetariánska</span>
                   </label>
                   <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
-                    <input type="checkbox" name="tabor_strava" value="Bezlepková (celiakia)" class="accent-brand-blue" />
+                    <input type="radio" name="tabor_strava" value="Bezlepková (celiakia)" class="accent-brand-blue" />
                     <span>Bezlepková</span>
                   </label>
                   <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80">
-                    <input type="checkbox" name="tabor_strava" value="Bezlaktózová" class="accent-brand-blue" />
+                    <input type="radio" name="tabor_strava" value="Bezlaktózová" class="accent-brand-blue" />
                     <span>Bezlaktózová</span>
                   </label>
                   <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-cream p-3 text-xs font-semibold ring-1 ring-ink/5 transition has-checked:bg-brand-blue has-checked:text-white hover:bg-cream/80 sm:col-span-2">
-                    <input type="checkbox" name="tabor_strava" value="Potravinové alergie / Iná diéta" class="accent-brand-blue" />
+                    <input type="radio" name="tabor_strava" value="Potravinové alergie / Iná diéta" class="accent-brand-blue" />
                     <span>Potravinové alergie / Iné</span>
                   </label>
                 </div>
-              </div>
+              </fieldset>
 
               <label class="block">
                 <span class="mb-1.5 block text-sm font-semibold">Zdravotné obmedzenia, alergie a poznámky (nepovinné)</span>
@@ -357,6 +350,9 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 <span class="text-brand-red" aria-hidden="true">*</span>
               </span>
             </label>
+            <div class="sm:col-span-2">
+              <div id="recaptcha" aria-label="Overenie proti automatizovaným odoslaniam"></div>
+            </div>
           </div>
         </fieldset>
         <p class="mb-6 text-xs text-muted">Polia označené <span class="text-brand-red">*</span> sú povinné.</p>
@@ -374,7 +370,23 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   </section>
 </Base>
 
+<script is:inline>
+  window.__onInquiryCaptchaLoad = () => window.dispatchEvent(new Event('inquiry-captcha-ready'));
+</script>
+<script is:inline src={`https://www.google.com/recaptcha/api.js?onload=__onInquiryCaptchaLoad&render=explicit`} async defer></script>
+
 <script>
+  declare global {
+    interface Window {
+      __onInquiryCaptchaLoad?: () => void;
+      grecaptcha?: {
+        getResponse(widgetId?: number): string;
+        render(container: HTMLElement, parameters: { sitekey: string }): number;
+        reset(widgetId?: number): void;
+      };
+    }
+  }
+
   const form = document.getElementById('inquiry') as HTMLFormElement;
   const steps = [...form.querySelectorAll<HTMLFieldSetElement>('[data-step]')];
   const progress = [...document.querySelectorAll<HTMLElement>('[data-progress-step]')];
@@ -394,11 +406,11 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   const datumInput = document.getElementById('datum') as HTMLInputElement;
   const datumHint = document.getElementById('datum-hint') as HTMLElement;
   const casStandardWrap = document.getElementById('cas-standard-wrap') as HTMLElement;
-  const casTaborWrap = document.getElementById('cas-tabor-wrap') as HTMLElement;
   const casStartInput = document.getElementById('cas-start') as HTMLInputElement;
   const casDurationChips = [...document.querySelectorAll<HTMLButtonElement>('[data-duration]')];
   const casCustomDuration = document.getElementById('cas-custom-duration') as HTMLInputElement;
   const casFinal = document.getElementById('cas-final') as HTMLInputElement;
+  const miestoWrap = document.getElementById('miesto-wrap') as HTMLElement;
   const miestoLabel = document.getElementById('miesto-label') as HTMLElement;
   const miestoInput = document.getElementById('miesto') as HTMLInputElement;
   const pocetDetiWrap = document.getElementById('pocet-deti-wrap') as HTMLElement;
@@ -409,8 +421,20 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   const step2Label = document.querySelector<HTMLElement>('[data-step-2-label]')!;
   const taborDetiInput = document.getElementById('tabor-deti-info') as HTMLInputElement;
   const taborZdravieInput = document.getElementById('tabor-zdravie-info') as HTMLTextAreaElement;
+  const taborStravaInputs = [...form.querySelectorAll<HTMLInputElement>('input[name="tabor_strava"]')];
+  const recaptchaContainer = document.getElementById('recaptcha') as HTMLElement;
+  const recaptchaSiteKey = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY;
+  let recaptchaWidgetId: number | undefined;
 
   let selectedDuration = '2 hodiny';
+
+  function renderRecaptcha() {
+    if (recaptchaWidgetId !== undefined || !window.grecaptcha || !recaptchaSiteKey) return;
+    recaptchaWidgetId = window.grecaptcha.render(recaptchaContainer, { sitekey: recaptchaSiteKey });
+  }
+
+  window.addEventListener('inquiry-captcha-ready', renderRecaptcha);
+  renderRecaptcha();
 
   function isTaborSelected() {
     const checked = form.querySelector<HTMLInputElement>('input[name="Typ akcie"]:checked');
@@ -470,7 +494,6 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     const isTabor = isTaborSelected();
     taborCallout.hidden = !isTabor;
     casStandardWrap.hidden = isTabor;
-    casTaborWrap.hidden = !isTabor;
     step2Standard.hidden = isTabor;
     step2Tabor.hidden = !isTabor;
     step2Label.textContent = isTabor ? 'Údaje dieťaťa' : 'Požiadavky';
@@ -480,6 +503,8 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     datumInput.required = !isTabor;
     pocetDetiWrap.hidden = isTabor;
     pocetDetiSelect.required = !isTabor;
+
+    miestoWrap.classList.toggle('sm:col-span-2', isTabor);
 
     if (isTabor) {
       miestoLabel.innerHTML = 'Miesto / Vaša lokalita <span class="text-brand-red" aria-hidden="true">*</span>';
@@ -529,6 +554,12 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
           taborDetiInput.reportValidity();
           return false;
         }
+        const selectedDiet = taborStravaInputs.find((input) => input.checked);
+        if (!selectedDiet) {
+          taborStravaInputs[0]?.focus();
+          taborStravaInputs[0]?.reportValidity();
+          return false;
+        }
         return true;
       }
       return mascotsValid();
@@ -557,7 +588,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     }
     if (i === 1) {
       if (isTaborSelected()) {
-        return taborDetiInput.value.trim().length > 0;
+        return taborDetiInput.value.trim().length > 0 && taborStravaInputs.some((input) => input.checked);
       }
       if (maskotiService?.checked && mascotChecks.filter((c) => c.checked).length < 2) return false;
       return true;
@@ -640,6 +671,12 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
       location.href = '/objednavka/dakujeme/';
       return;
     }
+    const recaptchaToken = recaptchaWidgetId === undefined ? '' : window.grecaptcha?.getResponse(recaptchaWidgetId) ?? '';
+    if (!recaptchaToken) {
+      errorBox.textContent = 'Potvrďte prosím overenie proti automatizovaným odoslaniam.';
+      errorBox.hidden = false;
+      return;
+    }
     submitBtn.disabled = true;
     submitBtn.textContent = 'Odosielam…';
     errorBox.hidden = true;
@@ -650,20 +687,19 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
         if (typeof value !== 'string') continue;
         payload[key] = key in payload ? `${payload[key]}, ${value}` : value;
       }
+      payload.recaptchaToken = recaptchaToken;
 
       // Customize payload for Pobytový tábor
       if (isTaborSelected()) {
         payload['Dátum'] = 'Letný turnus (1 turnus v roku – potvrdíme e-mailom)';
         payload['Počet detí'] = 'Podľa registrácie dieťaťa';
         payload['Služby'] = 'Kompletný táborový program (animátori, maskoti, hry)';
-        const diets = [...form.querySelectorAll<HTMLInputElement>('input[name="tabor_strava"]:checked')].map(c => c.value);
+        const diet = form.querySelector<HTMLInputElement>('input[name="tabor_strava"]:checked')?.value;
         const ageInfo = taborDetiInput.value.trim();
         const healthInfo = taborZdravieInput.value.trim();
-        const notes: string[] = [];
-        if (ageInfo) notes.push(`Meno a vek detí: ${ageInfo}`);
-        if (diets.length) notes.push(`Stravovanie: ${diets.join(', ')}`);
-        if (healthInfo) notes.push(`Zdravie a poznámky: ${healthInfo}`);
-        payload['Iné požiadavky'] = notes.join('\n');
+        payload['tabor-deti-info'] = ageInfo;
+        payload['tabor_strava'] = diet ?? '';
+        payload['tabor-zdravie-info'] = healthInfo;
       }
 
       const res = await fetch(form.action, {
@@ -674,7 +710,9 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
       if (!res.ok) throw new Error(String(res.status));
       location.href = '/objednavka/dakujeme/';
     } catch {
+      errorBox.textContent = 'Objednávku sa nepodarilo odoslať. Skúste to prosím znova alebo nám napíšte na info@detickovoakcie.sk.';
       errorBox.hidden = false;
+      if (recaptchaWidgetId !== undefined) window.grecaptcha?.reset(recaptchaWidgetId);
       submitBtn.disabled = false;
       submitBtn.textContent = 'Odoslať nezáväznú objednávku';
     }
