@@ -1,0 +1,6 @@
+---
+name: Mickey vo folklórnom oblečení
+photo: /uploads/mascot-mickey.svg
+category: disney
+order: 24
+---

@@ -19,6 +19,14 @@ const CATEGORIES = [
 const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.category === c.id));
 ---
 
+<!-- Prominent Mascot Requirement Disclaimer -->
+<div class="mb-6 flex items-center gap-3.5 rounded-2xl bg-amber-500/10 p-4 text-amber-950 ring-1 ring-amber-500/20">
+  <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-xl" aria-hidden="true">💡</span>
+  <p class="text-sm sm:text-base font-medium leading-relaxed">
+    <strong class="font-bold text-amber-900">Upozornenie:</strong> Na akciu je potrebné vybrať <span class="font-bold underline decoration-amber-500 decoration-2">minimálne 2 maskotov</span>.
+  </p>
+</div>
+
 <div class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter maskotov">
   <button type="button" class="chip !bg-ink !text-white" data-mascot-filter="all">Všetci</button>
   {usedCategories.map((c) => (
@@ -61,12 +69,41 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   ))}
 </div>
 
+<!-- Bottom gradient shadow vignette when selection floating bar is active -->
+<div
+  class="fixed inset-x-0 bottom-0 h-44 pointer-events-none bg-gradient-to-t from-ink/20 via-ink/5 to-transparent transition-opacity duration-300 hidden"
+  style="z-index: 50;"
+  data-mascot-gradient
+  aria-hidden="true"
+></div>
+
 <!-- Floating selection banner -->
-<div class="fixed inset-x-0 bottom-4 z-40 hidden px-4" data-mascot-cta aria-live="polite">
-  <div class="mx-auto flex w-fit max-w-full flex-col items-center gap-2 rounded-3xl bg-white p-2 shadow-2xl shadow-ink/25 ring-1 ring-ink/10 sm:flex-row sm:gap-3 sm:rounded-full sm:py-2 sm:pl-3 sm:pr-2">
-    <div class="flex max-w-full flex-wrap justify-center -space-x-2 sm:shrink-0 sm:flex-nowrap" data-mascot-avatars></div>
-    <p class="hidden whitespace-nowrap font-display text-sm font-bold sm:block"><span data-mascot-count>0</span> vybraných</p>
-    <a href={ctaBase} data-mascot-link data-cta-base={ctaBase} class="btn-primary !px-5 !py-2.5 text-sm whitespace-nowrap">{ctaLabel}</a>
+<div
+  class="fixed inset-x-0 bottom-4 hidden px-3 transition-all duration-300 sm:px-6"
+  style="z-index: 60;"
+  data-mascot-cta
+  aria-live="polite"
+>
+  <div class="mx-auto flex w-full max-w-2xl flex-col items-center justify-between gap-3 rounded-3xl bg-white/95 p-3.5 shadow-2xl shadow-ink/30 ring-1 ring-ink/15 backdrop-blur-md sm:flex-row sm:rounded-full sm:py-3 sm:pl-4 sm:pr-3">
+    <div class="flex items-center gap-3.5">
+      <div class="flex max-w-full flex-wrap justify-center -space-x-3 shrink-0 sm:flex-nowrap" data-mascot-avatars></div>
+      <div class="text-center sm:text-left">
+        <div class="font-display text-sm font-bold text-ink sm:text-base">
+          <span data-mascot-count>0</span> <span data-mascot-count-label>vybraných maskotov</span>
+        </div>
+        <div data-mascot-status class="mt-0.5 text-xs font-semibold">
+          <!-- Dynamic status badge -->
+        </div>
+      </div>
+    </div>
+    <a
+      href={ctaBase}
+      data-mascot-link
+      data-cta-base={ctaBase}
+      class="btn-primary w-full sm:w-auto !px-6 !py-3 text-sm sm:text-base font-bold whitespace-nowrap shadow-md transition-all text-center"
+    >
+      {ctaLabel}
+    </a>
   </div>
 </div>
 
@@ -165,10 +202,27 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   // Selection carried to the order form via ?maskoti= ids
   const selected = new Set<string>();
   const cta = document.querySelector<HTMLElement>('[data-mascot-cta]')!;
+  const gradient = document.querySelector<HTMLElement>('[data-mascot-gradient]');
   const count = cta.querySelector<HTMLElement>('[data-mascot-count]')!;
+  const countLabel = cta.querySelector<HTMLElement>('[data-mascot-count-label]')!;
+  const statusBadge = cta.querySelector<HTMLElement>('[data-mascot-status]')!;
   const link = cta.querySelector<HTMLAnchorElement>('[data-mascot-link]')!;
   const avatars = cta.querySelector<HTMLElement>('[data-mascot-avatars]')!;
   const MAX_AVATARS = 5;
+
+  function adjustCtaPosition() {
+    if (!cta) return;
+    const cookieNotice = document.getElementById('cookie-notice');
+    if (cookieNotice && !cookieNotice.hidden) {
+      const h = cookieNotice.offsetHeight || 60;
+      cta.style.bottom = `${h + 12}px`;
+    } else {
+      cta.style.bottom = '';
+    }
+  }
+
+  window.addEventListener('resize', adjustCtaPosition);
+  window.addEventListener('cookie-notice-dismissed', adjustCtaPosition);
 
   function renderAvatars() {
     avatars.innerHTML = '';
@@ -180,15 +234,48 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
       const img = document.createElement('img');
       img.src = src;
       img.alt = card?.dataset.mascotName ?? '';
-      img.className = 'h-9 w-9 rounded-full border-2 border-white object-cover';
+      img.className = 'h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 border-white object-cover shadow-sm';
       avatars.appendChild(img);
     });
     if (ids.length > MAX_AVATARS) {
       const more = document.createElement('span');
       more.textContent = `+${ids.length - MAX_AVATARS}`;
-      more.className = 'flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-sand text-xs font-bold';
+      more.className = 'flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 border-white bg-sand text-xs sm:text-sm font-bold shadow-sm';
       avatars.appendChild(more);
     }
+  }
+
+  function updateCtaState() {
+    const size = selected.size;
+    count.textContent = String(size);
+    if (countLabel) {
+      if (size === 1) countLabel.textContent = 'vybraný maskot';
+      else if (size >= 2 && size <= 4) countLabel.textContent = 'vybraní maskoti';
+      else countLabel.textContent = 'vybraných maskotov';
+    }
+
+    if (size < 2) {
+      if (statusBadge) {
+        statusBadge.innerHTML = '<span class="inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">⚠️ Vyberte ešte 1 maskota (min. 2)</span>';
+      }
+      link.classList.add('pointer-events-none', 'opacity-50', 'grayscale');
+      link.setAttribute('aria-disabled', 'true');
+      link.setAttribute('tabindex', '-1');
+    } else {
+      if (statusBadge) {
+        statusBadge.innerHTML = '<span class="inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">✓ Splnené min. 2 maskoti</span>';
+      }
+      link.classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
+      link.removeAttribute('aria-disabled');
+      link.removeAttribute('tabindex');
+    }
+
+    const base = link.dataset.ctaBase!;
+    link.href = `${base}${base.includes('?') ? '&' : '?'}maskoti=${[...selected].join(',')}`;
+    renderAvatars();
+    cta.classList.toggle('hidden', size === 0);
+    if (gradient) gradient.classList.toggle('hidden', size === 0);
+    adjustCtaPosition();
   }
 
   document.querySelectorAll<HTMLButtonElement>('[data-mascot-select]').forEach((btn) => {
@@ -197,11 +284,7 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
       const pressed = !selected.has(id);
       pressed ? selected.add(id) : selected.delete(id);
       btn.setAttribute('aria-pressed', String(pressed));
-      count.textContent = String(selected.size);
-      const base = link.dataset.ctaBase!;
-      link.href = `${base}${base.includes('?') ? '&' : '?'}maskoti=${[...selected].join(',')}`;
-      renderAvatars();
-      cta.classList.toggle('hidden', selected.size === 0);
+      updateCtaState();
     });
   });
 
