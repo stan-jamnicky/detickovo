@@ -65,8 +65,8 @@ export const POST: APIRoute = async ({ request, clientAddress, url }) => {
 
   const recaptchaSecret = configured('RECAPTCHA_SECRET_KEY');
   const rateLimitSalt = configured('RATE_LIMIT_SALT');
-  const redisUrl = configured('UPSTASH_REDIS_REST_URL');
-  const redisToken = configured('UPSTASH_REDIS_REST_TOKEN');
+  const redisUrl = configured('KV_REST_API_URL');
+  const redisToken = configured('KV_REST_API_TOKEN');
   const smtpHost = configured('SMTP_HOST');
   const smtpUser = configured('SMTP_USER');
   const smtpPassword = configured('SMTP_PASSWORD');

@@ -180,7 +180,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
             </div>
 
             <!-- Miesto -->
-            <label class="block">
+            <label class="block" id="miesto-wrap">
               <span class="mb-1.5 block text-sm font-semibold" id="miesto-label">Miesto akcie <span class="text-brand-red" aria-hidden="true">*</span></span>
               <div class="relative">
                 <input
@@ -410,6 +410,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
   const casDurationChips = [...document.querySelectorAll<HTMLButtonElement>('[data-duration]')];
   const casCustomDuration = document.getElementById('cas-custom-duration') as HTMLInputElement;
   const casFinal = document.getElementById('cas-final') as HTMLInputElement;
+  const miestoWrap = document.getElementById('miesto-wrap') as HTMLElement;
   const miestoLabel = document.getElementById('miesto-label') as HTMLElement;
   const miestoInput = document.getElementById('miesto') as HTMLInputElement;
   const pocetDetiWrap = document.getElementById('pocet-deti-wrap') as HTMLElement;
@@ -502,6 +503,8 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     datumInput.required = !isTabor;
     pocetDetiWrap.hidden = isTabor;
     pocetDetiSelect.required = !isTabor;
+
+    miestoWrap.classList.toggle('sm:col-span-2', isTabor);
 
     if (isTabor) {
       miestoLabel.innerHTML = 'Miesto / Vaša lokalita <span class="text-brand-red" aria-hidden="true">*</span>';
