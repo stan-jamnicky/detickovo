@@ -30,3 +30,23 @@ ADMIN_SECRET="your-admin-password"
 ```
 
 `MONGODB_DB` defaults to `detickovo`, but set it explicitly in Vercel. Add the same variables in Vercel project settings for production.
+
+## Booking Form
+
+Booking requests are handled by the Vercel endpoint at `/api/objednavka`. Set these environment variables in Vercel (and in `.env.local` for local testing); do not commit any secret values:
+
+```env
+PUBLIC_RECAPTCHA_SITE_KEY="XXX"
+RECAPTCHA_SECRET_KEY="..."
+KV_REST_API_URL="https://..."
+KV_REST_API_TOKEN="..."
+RATE_LIMIT_SALT="a-long-random-secret"
+SMTP_HOST="smtp.forpsi.com"
+SMTP_PORT="465"
+SMTP_USER="info@detickovoakcie.sk"
+SMTP_PASSWORD="..."
+SMTP_FROM="Detičkovo <info@detickovoakcie.sk>"
+ORDER_RECIPIENT="info@detickovoakcie.sk"
+```
+
+Create a Google reCAPTCHA v2 Checkbox key for the production and preview domains used by the form. Create an Upstash Redis database and use its REST credentials for rate limiting. The SMTP credentials are the FORPSI mailbox credentials; test a preview deployment to confirm mail delivery before relying on the form in production.
