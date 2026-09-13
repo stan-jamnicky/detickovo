@@ -1,5 +1,5 @@
 ---
-name: Minnie v klasickom oblečení
+name: Minnie
 photo: /uploads/mascot-minnie.svg
 category: disney
 order: 2
