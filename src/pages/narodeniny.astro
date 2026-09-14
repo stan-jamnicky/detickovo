@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import Confetti from '../components/Confetti.astro';
 import MascotGrid from '../components/MascotGrid.astro';
 import CTASection from '../components/CTASection.astro';
+import EventCarousel from '../components/EventCarousel.astro';
+import { listEventPosts } from '../lib/eventPosts';
 
 const included = [
   { icon: '🐻', title: 'Maskot podľa výberu', text: 'Oslávenca privíta jeho obľúbená postavička.' },
@@ -10,6 +12,7 @@ const included = [
   { icon: '🎨', title: 'Maľovanie na tvár', text: 'Každé dieťa odchádza s vysnívanou maskou.' },
   { icon: '🎀', title: 'Balónová výzdoba', text: 'Balónové brány a výzdoba, ktorá rozžiari oslavu.' },
 ];
+const events = (await listEventPosts()).filter((event) => event.eventType === 'narodeniny');
 ---
 
 <Base
@@ -57,6 +60,8 @@ const included = [
       </div>
     </div>
   </section>
+
+  <EventCarousel events={events} title="Narodeninové oslavy" />
 
   <CTASection
     title="Kedy má váš drobec narodeniny?"
