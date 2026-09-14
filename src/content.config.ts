@@ -11,11 +11,20 @@ const services = defineCollection({
   }),
 });
 
+const imagePosition = z.object({
+  x: z.number().min(0).max(100).default(50),
+  y: z.number().min(0).max(100).default(50),
+  scale: z.number().min(0.1).max(3).default(1),
+});
+
 const mascots = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/mascots' }),
   schema: z.object({
     name: z.string(),
     photo: z.string(),
+    photoPosition: imagePosition.optional(),
+    realPhoto: z.string().optional(),
+    realPhotoPosition: imagePosition.optional(),
     category: z.enum(['labkova-patrola', 'ladove-kralovstvo', 'superhrdinovia', 'disney', 'ostatni']).default('ostatni'),
     order: z.number().default(99),
   }),

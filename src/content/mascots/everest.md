@@ -1,6 +1,7 @@
 ---
 name: Everest
-photo: /uploads/mascot-everest.svg
+photo: /uploads/illustrations/everest.webp
+realPhoto: /uploads/real-mascots/everest.jpg
 category: labkova-patrola
 order: 6
 ---

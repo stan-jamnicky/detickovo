@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import CTASection from '../components/CTASection.astro';
+import EventCarousel from '../components/EventCarousel.astro';
+import { listEventPosts } from '../lib/eventPosts';
 
 const perks = [
   { icon: '🏕️', title: 'Detský kútik v sále', text: 'Bezpečná zóna s hračkami, kde majú deti vlastný svet.' },
@@ -8,6 +10,7 @@ const perks = [
   { icon: '✂️', title: 'Tiché aktivity', text: 'Tvorivé dielne a hry, ktoré nerušia príhovory ani prvý tanec.' },
   { icon: '🌙', title: 'Večerný režim', text: 'Rozprávka a pokojný program, keď malým hosťom dochádzajú sily.' },
 ];
+const events = (await listEventPosts()).filter((event) => event.eventType === 'svadba');
 ---
 
 <Base
@@ -44,6 +47,8 @@ const perks = [
       </div>
     </div>
   </section>
+
+  <EventCarousel events={events} title="Svadby, na ktorých sme zabávali" />
 
   <CTASection
     title="Plánujete svadbu s malými hosťami?"

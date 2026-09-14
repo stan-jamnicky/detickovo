@@ -1,6 +1,7 @@
 ---
 name: Anjel
-photo: /uploads/mascot-anjel.svg
+photo: /uploads/illustrations/anjel.webp
+realPhoto: /uploads/real-mascots/anjel+mikulas.jpg
 category: ostatni
 order: 17
 ---

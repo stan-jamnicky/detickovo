@@ -1,5 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
+import MascotCard from './MascotCard.astro';
+import MascotZoomDialog from './MascotZoomDialog.astro';
 
 interface Props {
   ctaBase?: string;
@@ -19,6 +21,14 @@ const CATEGORIES = [
 const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.category === c.id));
 ---
 
+<!-- Prominent Mascot Requirement Disclaimer -->
+<div class="mb-6 flex items-center gap-3.5 rounded-2xl bg-amber-500/10 p-4 text-amber-950 ring-1 ring-amber-500/20">
+  <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-xl" aria-hidden="true">💡</span>
+  <p class="text-sm sm:text-base font-medium leading-relaxed">
+    <strong class="font-bold text-amber-900">Upozornenie:</strong> Na akciu je potrebné vybrať <span class="font-bold underline decoration-amber-500 decoration-2">minimálne 2 maskotov</span>.
+  </p>
+</div>
+
 <div class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter maskotov">
   <button type="button" class="chip !bg-ink !text-white" data-mascot-filter="all">Všetci</button>
   {usedCategories.map((c) => (
@@ -26,127 +36,51 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   ))}
 </div>
 
-<p class="mb-4 text-sm text-muted">Ťuknutím maskota vyberiete, lupou si prezriete fotku.</p>
+<p class="mb-4 text-sm text-muted">Ťuknutím maskota vyberiete, tlačidlom „Náhľad“ uvidíte, ako vyzerá naživo.</p>
 
 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" data-mascot-grid>
-  {mascots.map((m) => (
-    <div class="relative" data-mascot-card data-mascot-category={m.data.category}>
-      <button
-        type="button"
-        aria-pressed="false"
-        data-mascot-select
-        data-mascot-id={m.id}
-        data-mascot-name={m.data.name}
-        class="group w-full overflow-hidden rounded-blob bg-white text-left ring-2 ring-ink/5 transition hover:ring-brand-blue/40 aria-pressed:ring-brand-blue"
-      >
-        <span class="absolute left-3 top-3 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white group-aria-pressed:flex" aria-hidden="true">✓</span>
-        <img
-          src={m.data.photo}
-          alt={m.data.name}
-          width="1200"
-          height="800"
-          loading="lazy"
-          class="aspect-square w-full object-cover"
-        />
-        <span class="block p-4 text-center font-display font-bold transition group-aria-pressed:bg-brand-blue group-aria-pressed:text-white">{m.data.name}</span>
-      </button>
-      <button
-        type="button"
-        data-mascot-zoom
-        data-mascot-name={m.data.name}
-        aria-label={`Zväčšiť fotku – ${m.data.name}`}
-        class="absolute right-3 top-3 z-10 flex h-8 w-8 cursor-zoom-in items-center justify-center rounded-full bg-white/90 text-sm shadow ring-1 ring-ink/10 hover:bg-white"
-      >🔍</button>
-    </div>
-  ))}
+  {mascots.map((m) => <MascotCard mascot={m} mode="button" />)}
 </div>
+
+<!-- Bottom gradient shadow vignette when selection floating bar is active -->
+<div
+  class="fixed inset-x-0 bottom-0 h-44 pointer-events-none bg-gradient-to-t from-ink/20 via-ink/5 to-transparent transition-opacity duration-300 hidden"
+  style="z-index: 50;"
+  data-mascot-gradient
+  aria-hidden="true"
+></div>
 
 <!-- Floating selection banner -->
-<div class="fixed inset-x-0 bottom-4 z-40 hidden px-4" data-mascot-cta aria-live="polite">
-  <div class="mx-auto flex w-fit max-w-full flex-col items-center gap-2 rounded-3xl bg-white p-2 shadow-2xl shadow-ink/25 ring-1 ring-ink/10 sm:flex-row sm:gap-3 sm:rounded-full sm:py-2 sm:pl-3 sm:pr-2">
-    <div class="flex max-w-full flex-wrap justify-center -space-x-2 sm:shrink-0 sm:flex-nowrap" data-mascot-avatars></div>
-    <p class="hidden whitespace-nowrap font-display text-sm font-bold sm:block"><span data-mascot-count>0</span> vybraných</p>
-    <a href={ctaBase} data-mascot-link data-cta-base={ctaBase} class="btn-primary !px-5 !py-2.5 text-sm whitespace-nowrap">{ctaLabel}</a>
+<div
+  class="fixed inset-x-0 bottom-4 hidden px-3 transition-all duration-300 sm:px-6"
+  style="z-index: 60;"
+  data-mascot-cta
+  aria-live="polite"
+>
+  <div class="mx-auto flex w-full max-w-2xl flex-col items-center justify-between gap-3 rounded-3xl bg-white/95 p-3.5 shadow-2xl shadow-ink/30 ring-1 ring-ink/15 backdrop-blur-md sm:flex-row sm:rounded-full sm:py-3 sm:pl-4 sm:pr-3">
+    <div class="flex items-center gap-3.5">
+      <div class="flex max-w-full flex-wrap justify-center -space-x-3 shrink-0 sm:flex-nowrap" data-mascot-avatars></div>
+      <div class="text-center sm:text-left">
+        <div class="font-display text-sm font-bold text-ink sm:text-base">
+          <span data-mascot-count>0</span> <span data-mascot-count-label>vybraných maskotov</span>
+        </div>
+        <div data-mascot-status class="mt-0.5 text-xs font-semibold">
+          <!-- Dynamic status badge -->
+        </div>
+      </div>
+    </div>
+    <a
+      href={ctaBase}
+      data-mascot-link
+      data-cta-base={ctaBase}
+      class="btn-primary w-full sm:w-auto !px-6 !py-3 text-sm sm:text-base font-bold whitespace-nowrap shadow-md transition-all text-center"
+    >
+      {ctaLabel}
+    </a>
   </div>
 </div>
 
-<dialog
-  data-mascot-dialog
-  class="hidden open:flex open:flex-col fixed inset-0 m-0 h-dvh w-dvw max-h-none max-w-none border-0 bg-white/95 p-0 text-ink backdrop:bg-white/95 overflow-hidden z-50"
-  aria-label="Detail maskota"
->
-  <!-- Static Top Bar -->
-  <header class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-ink/10 bg-white/90 px-4 sm:px-6 backdrop-blur-md select-none">
-    <!-- Top left: Mascot name -->
-    <div class="flex items-center min-w-0 pr-3">
-      <h3 class="font-display text-lg sm:text-2xl font-bold text-ink truncate" data-mascot-caption></h3>
-    </div>
-
-    <!-- Top right: Zoom controls + Close button -->
-    <div class="flex items-center gap-2 shrink-0">
-      <div class="flex items-center rounded-full bg-sand/80 p-1 ring-1 ring-ink/10" role="group" aria-label="Ovládanie priblíženia">
-        <button
-          type="button"
-          data-mascot-zoom-out
-          class="flex h-8 w-8 items-center justify-center rounded-full text-ink/70 hover:bg-white hover:text-ink transition cursor-pointer"
-          aria-label="Oddialiť"
-          title="Oddialiť (−)"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
-        </button>
-        <button
-          type="button"
-          data-mascot-zoom-reset
-          class="px-2 h-8 text-xs font-mono font-semibold text-ink/80 hover:text-ink transition cursor-pointer rounded-full hover:bg-white/60"
-          aria-label="Obnoviť priblíženie"
-          title="Obnoviť na 100%"
-        >
-          <span data-mascot-zoom-level>100%</span>
-        </button>
-        <button
-          type="button"
-          data-mascot-zoom-in
-          class="flex h-8 w-8 items-center justify-center rounded-full text-ink/70 hover:bg-white hover:text-ink transition cursor-pointer"
-          aria-label="Priblížiť"
-          title="Priblížiť (+)"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-        </button>
-      </div>
-
-      <button
-        type="button"
-        data-mascot-close
-        class="flex h-10 w-10 items-center justify-center rounded-full bg-sand/80 text-ink hover:bg-sand transition cursor-pointer ring-1 ring-ink/10 ml-1"
-        aria-label="Zavrieť detail maskota"
-        title="Zavrieť (Esc)"
-      >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- Interactive Image Viewport -->
-  <div
-    class="relative flex-1 w-full h-[calc(100dvh-4rem)] overflow-hidden flex items-center justify-center touch-none select-none bg-cream/40"
-    data-mascot-viewport
-  >
-    <img
-      src=""
-      alt=""
-      class="max-h-[85vh] max-w-[90vw] object-contain pointer-events-none select-none will-change-transform rounded-xl shadow-xl ring-1 ring-ink/5"
-      data-mascot-img
-      draggable="false"
-    />
-
-    <!-- Bottom Helper Hint -->
-    <div class="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-3.5 py-1.5 text-xs text-ink/70 shadow-sm backdrop-blur-md ring-1 ring-ink/10 transition-opacity duration-300">
-      <span>Kolieskom myši alebo gestom prstov priblížite</span>
-    </div>
-  </div>
-</dialog>
+<MascotZoomDialog />
 
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-mascot-filter]');
@@ -165,10 +99,27 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   // Selection carried to the order form via ?maskoti= ids
   const selected = new Set<string>();
   const cta = document.querySelector<HTMLElement>('[data-mascot-cta]')!;
+  const gradient = document.querySelector<HTMLElement>('[data-mascot-gradient]');
   const count = cta.querySelector<HTMLElement>('[data-mascot-count]')!;
+  const countLabel = cta.querySelector<HTMLElement>('[data-mascot-count-label]')!;
+  const statusBadge = cta.querySelector<HTMLElement>('[data-mascot-status]')!;
   const link = cta.querySelector<HTMLAnchorElement>('[data-mascot-link]')!;
   const avatars = cta.querySelector<HTMLElement>('[data-mascot-avatars]')!;
   const MAX_AVATARS = 5;
+
+  function adjustCtaPosition() {
+    if (!cta) return;
+    const cookieNotice = document.getElementById('cookie-notice');
+    if (cookieNotice && !cookieNotice.hidden) {
+      const h = cookieNotice.offsetHeight || 60;
+      cta.style.bottom = `${h + 12}px`;
+    } else {
+      cta.style.bottom = '';
+    }
+  }
+
+  window.addEventListener('resize', adjustCtaPosition);
+  window.addEventListener('cookie-notice-dismissed', adjustCtaPosition);
 
   function renderAvatars() {
     avatars.innerHTML = '';
@@ -180,15 +131,48 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
       const img = document.createElement('img');
       img.src = src;
       img.alt = card?.dataset.mascotName ?? '';
-      img.className = 'h-9 w-9 rounded-full border-2 border-white object-cover';
+      img.className = 'h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 border-white object-contain bg-white shadow-sm';
       avatars.appendChild(img);
     });
     if (ids.length > MAX_AVATARS) {
       const more = document.createElement('span');
       more.textContent = `+${ids.length - MAX_AVATARS}`;
-      more.className = 'flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-sand text-xs font-bold';
+      more.className = 'flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 border-white bg-sand text-xs sm:text-sm font-bold shadow-sm';
       avatars.appendChild(more);
     }
+  }
+
+  function updateCtaState() {
+    const size = selected.size;
+    count.textContent = String(size);
+    if (countLabel) {
+      if (size === 1) countLabel.textContent = 'vybraný maskot';
+      else if (size >= 2 && size <= 4) countLabel.textContent = 'vybraní maskoti';
+      else countLabel.textContent = 'vybraných maskotov';
+    }
+
+    if (size < 2) {
+      if (statusBadge) {
+        statusBadge.innerHTML = '<span class="inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">⚠️ Vyberte ešte 1 maskota (min. 2)</span>';
+      }
+      link.classList.add('pointer-events-none', 'opacity-50', 'grayscale');
+      link.setAttribute('aria-disabled', 'true');
+      link.setAttribute('tabindex', '-1');
+    } else {
+      if (statusBadge) {
+        statusBadge.innerHTML = '<span class="inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800">✓ Splnené min. 2 maskoti</span>';
+      }
+      link.classList.remove('pointer-events-none', 'opacity-50', 'grayscale');
+      link.removeAttribute('aria-disabled');
+      link.removeAttribute('tabindex');
+    }
+
+    const base = link.dataset.ctaBase!;
+    link.href = `${base}${base.includes('?') ? '&' : '?'}maskoti=${[...selected].join(',')}`;
+    renderAvatars();
+    cta.classList.toggle('hidden', size === 0);
+    if (gradient) gradient.classList.toggle('hidden', size === 0);
+    adjustCtaPosition();
   }
 
   document.querySelectorAll<HTMLButtonElement>('[data-mascot-select]').forEach((btn) => {
@@ -197,219 +181,7 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
       const pressed = !selected.has(id);
       pressed ? selected.add(id) : selected.delete(id);
       btn.setAttribute('aria-pressed', String(pressed));
-      count.textContent = String(selected.size);
-      const base = link.dataset.ctaBase!;
-      link.href = `${base}${base.includes('?') ? '&' : '?'}maskoti=${[...selected].join(',')}`;
-      renderAvatars();
-      cta.classList.toggle('hidden', selected.size === 0);
+      updateCtaState();
     });
-  });
-
-  const dialog = document.querySelector<HTMLDialogElement>('[data-mascot-dialog]')!;
-  const viewport = dialog.querySelector<HTMLElement>('[data-mascot-viewport]')!;
-  const img = dialog.querySelector<HTMLImageElement>('[data-mascot-img]')!;
-  const caption = dialog.querySelector<HTMLElement>('[data-mascot-caption]')!;
-  const zoomInBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-in]');
-  const zoomOutBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-out]');
-  const zoomResetBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-reset]');
-  const zoomLevel = dialog.querySelector<HTMLElement>('[data-mascot-zoom-level]');
-  const closeBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-close]');
-
-  let scale = 1;
-  let translateX = 0;
-  let translateY = 0;
-  const MIN_SCALE = 1;
-  const MAX_SCALE = 5;
-
-  const pointers = new Map<number, { x: number; y: number }>();
-  let prevPinchDist = 0;
-  let prevPinchCenter = { x: 0, y: 0 };
-  let isDragging = false;
-  let dragMoved = false;
-
-  function clampAndApply(animate = false) {
-    if (scale <= 1.001) {
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-    } else {
-      const vRect = viewport.getBoundingClientRect();
-      const naturalW = img.offsetWidth || vRect.width;
-      const naturalH = img.offsetHeight || vRect.height;
-      const scaledW = naturalW * scale;
-      const scaledH = naturalH * scale;
-
-      const maxPanX = Math.max(0, (scaledW - vRect.width) / 2 + 50);
-      const maxPanY = Math.max(0, (scaledH - vRect.height) / 2 + 50);
-
-      translateX = Math.max(-maxPanX, Math.min(maxPanX, translateX));
-      translateY = Math.max(-maxPanY, Math.min(maxPanY, translateY));
-    }
-
-    if (animate) {
-      img.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
-    } else {
-      img.style.transition = 'none';
-    }
-
-    img.style.transform = `translate3d(${Math.round(translateX * 10) / 10}px, ${Math.round(translateY * 10) / 10}px, 0) scale(${scale})`;
-
-    if (zoomLevel) {
-      zoomLevel.textContent = `${Math.round(scale * 100)}%`;
-    }
-    viewport.style.cursor = scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default';
-  }
-
-  function zoomAround(factor: number, clientX?: number, clientY?: number, animate = false) {
-    const vRect = viewport.getBoundingClientRect();
-    const focusX = clientX !== undefined ? clientX - (vRect.left + vRect.width / 2) : 0;
-    const focusY = clientY !== undefined ? clientY - (vRect.top + vRect.height / 2) : 0;
-
-    const targetScale = Math.min(Math.max(MIN_SCALE, scale * factor), MAX_SCALE);
-    if (Math.abs(targetScale - scale) < 0.001) return;
-
-    if (targetScale <= 1) {
-      scale = 1;
-      translateX = 0;
-      translateY = 0;
-    } else {
-      const pointX = (focusX - translateX) / scale;
-      const pointY = (focusY - translateY) / scale;
-      scale = targetScale;
-      translateX = focusX - pointX * scale;
-      translateY = focusY - pointY * scale;
-    }
-    clampAndApply(animate);
-  }
-
-  function resetZoom(animate = false) {
-    scale = 1;
-    translateX = 0;
-    translateY = 0;
-    clampAndApply(animate);
-  }
-
-  // Mouse wheel scroll to zoom
-  viewport.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
-    zoomAround(zoomFactor, e.clientX, e.clientY, false);
-  }, { passive: false });
-
-  // Pointer events (Pan on PC & Pinch-to-zoom on touch devices)
-  viewport.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 && e.pointerType === 'mouse') return;
-    viewport.setPointerCapture(e.pointerId);
-    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    isDragging = true;
-    dragMoved = false;
-
-    if (pointers.size === 2) {
-      const [p1, p2] = Array.from(pointers.values());
-      prevPinchDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-      prevPinchCenter = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-    }
-    clampAndApply(false);
-  });
-
-  viewport.addEventListener('pointermove', (e) => {
-    if (!pointers.has(e.pointerId)) return;
-
-    if (pointers.size === 1) {
-      const prev = pointers.get(e.pointerId)!;
-      const dx = e.clientX - prev.x;
-      const dy = e.clientY - prev.y;
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-        dragMoved = true;
-      }
-      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (scale > 1) {
-        translateX += dx;
-        translateY += dy;
-        clampAndApply(false);
-      }
-    } else if (pointers.size === 2) {
-      dragMoved = true;
-      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      const [p1, p2] = Array.from(pointers.values());
-      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-      const center = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-
-      if (prevPinchDist > 0 && dist > 0) {
-        const factor = dist / prevPinchDist;
-        zoomAround(factor, center.x, center.y, false);
-        translateX += center.x - prevPinchCenter.x;
-        translateY += center.y - prevPinchCenter.y;
-        clampAndApply(false);
-      }
-      prevPinchDist = dist;
-      prevPinchCenter = center;
-    }
-  });
-
-  const handlePointerEnd = (e: PointerEvent) => {
-    if (pointers.has(e.pointerId)) {
-      pointers.delete(e.pointerId);
-      try {
-        viewport.releasePointerCapture(e.pointerId);
-      } catch {}
-    }
-    if (pointers.size < 2) {
-      prevPinchDist = 0;
-    }
-    if (pointers.size === 0) {
-      isDragging = false;
-      clampAndApply(true);
-    }
-  };
-
-  viewport.addEventListener('pointerup', handlePointerEnd);
-  viewport.addEventListener('pointercancel', handlePointerEnd);
-
-  // Double click / Double tap to quickly zoom in / reset
-  viewport.addEventListener('dblclick', (e) => {
-    if (scale > 1.1) {
-      resetZoom(true);
-    } else {
-      zoomAround(2.5, e.clientX, e.clientY, true);
-    }
-  });
-
-  // Zoom control buttons
-  zoomInBtn?.addEventListener('click', () => zoomAround(1.35, undefined, undefined, true));
-  zoomOutBtn?.addEventListener('click', () => zoomAround(1 / 1.35, undefined, undefined, true));
-  zoomResetBtn?.addEventListener('click', () => resetZoom(true));
-
-  // Open mascot preview dialog
-  document.querySelectorAll<HTMLButtonElement>('[data-mascot-zoom]').forEach((zoom) => {
-    zoom.addEventListener('click', () => {
-      const card = zoom.closest('[data-mascot-card]')!;
-      const mascotImg = card.querySelector('img');
-      if (mascotImg) {
-        img.src = mascotImg.src;
-      }
-      img.alt = zoom.dataset.mascotName ?? '';
-      caption.textContent = zoom.dataset.mascotName ?? '';
-      resetZoom(false);
-      dialog.showModal();
-    });
-  });
-
-  // Close handlers
-  closeBtn?.addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', () => resetZoom(false));
-
-  // Keyboard controls
-  dialog.addEventListener('keydown', (e) => {
-    if (e.key === '+' || e.key === '=') {
-      e.preventDefault();
-      zoomAround(1.3, undefined, undefined, true);
-    } else if (e.key === '-' || e.key === '_') {
-      e.preventDefault();
-      zoomAround(1 / 1.3, undefined, undefined, true);
-    } else if (e.key === '0') {
-      e.preventDefault();
-      resetZoom(true);
-    }
   });
 </script>

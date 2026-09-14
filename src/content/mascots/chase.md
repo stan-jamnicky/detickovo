@@ -1,6 +1,7 @@
 ---
 name: Chase
-photo: /uploads/mascot-chase.svg
+photo: /uploads/illustrations/chase.webp
+realPhoto: /uploads/real-mascots/chase+skye.jpg
 category: labkova-patrola
 order: 3
 ---
