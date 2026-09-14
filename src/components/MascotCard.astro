@@ -1,0 +1,113 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  mascot: CollectionEntry<'mascots'>;
+  /** 'button' toggles aria-pressed selection (used on the maskoti page), 'checkbox' posts a form field (used in the order form) */
+  mode?: 'button' | 'checkbox';
+}
+const { mascot: m, mode = 'button' } = Astro.props;
+
+const pos = m.data.photoPosition;
+const frontStyle = `--pos-x:${pos?.x ?? 50}%;--pos-y:${pos?.y ?? 50}%;--img-scale:${pos?.scale ?? 1};`;
+const realPos = m.data.realPhotoPosition;
+const backStyle = `--pos-x:${realPos?.x ?? 50}%;--pos-y:${realPos?.y ?? 50}%;--img-scale:${realPos?.scale ?? 1};`;
+---
+
+<div class="relative" data-mascot-card data-mascot-category={m.data.category}>
+  {mode === 'button' ? (
+    <button
+      type="button"
+      aria-pressed="false"
+      data-mascot-select
+      data-mascot-id={m.id}
+      data-mascot-name={m.data.name}
+      class="group w-full overflow-hidden rounded-blob bg-white text-left ring-2 ring-ink/5 transition hover:ring-brand-blue/40 aria-pressed:ring-brand-blue"
+    >
+      <span class="absolute left-3 top-3 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white group-aria-pressed:flex" aria-hidden="true">✓</span>
+      <span class="mascot-flip aspect-square block w-full" data-mascot-flip-inner>
+        <span class="mascot-face mascot-face-front block h-full w-full">
+          <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" style={frontStyle} class="mascot-face-img h-full w-full" />
+        </span>
+        {m.data.realPhoto && (
+          <span class="mascot-face mascot-face-back block h-full w-full">
+            <img src={m.data.realPhoto} alt={`${m.data.name} naživo`} width="1200" height="800" loading="lazy" style={backStyle} class="mascot-face-img h-full w-full" />
+          </span>
+        )}
+      </span>
+      <span class="block p-4 text-center font-display font-bold transition group-aria-pressed:bg-brand-blue group-aria-pressed:text-white">{m.data.name}</span>
+    </button>
+  ) : (
+    <label class="group block w-full cursor-pointer overflow-hidden rounded-blob bg-white text-left ring-2 ring-ink/5 transition hover:ring-brand-blue/40 has-checked:ring-brand-blue">
+      <input type="checkbox" name="Maskoti" value={m.data.name} class="sr-only" data-mascot-check data-mascot-id={m.id} />
+      <span class="absolute left-3 top-3 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white group-has-checked:flex" aria-hidden="true">✓</span>
+      <span class="mascot-flip aspect-square block w-full" data-mascot-flip-inner>
+        <span class="mascot-face mascot-face-front block h-full w-full">
+          <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" style={frontStyle} class="mascot-face-img h-full w-full" />
+        </span>
+        {m.data.realPhoto && (
+          <span class="mascot-face mascot-face-back block h-full w-full">
+            <img src={m.data.realPhoto} alt={`${m.data.name} naživo`} width="1200" height="800" loading="lazy" style={backStyle} class="mascot-face-img h-full w-full" />
+          </span>
+        )}
+      </span>
+      <span class="block p-4 text-center font-display font-bold transition group-has-checked:bg-brand-blue group-has-checked:text-white">{m.data.name}</span>
+    </label>
+  )}
+  <button
+    type="button"
+    data-mascot-zoom
+    data-mascot-name={m.data.name}
+    aria-label={`Zväčšiť fotku – ${m.data.name}`}
+    class="absolute right-3 top-3 z-10 flex cursor-zoom-in items-center gap-1 rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-semibold shadow ring-1 ring-ink/10 hover:bg-white"
+  >
+    Náhľad
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 4H4v5m0 6v5h5m6 0h5v-5m0-6V4h-5" />
+    </svg>
+  </button>
+</div>
+
+<style>
+  .mascot-flip {
+    position: relative;
+    overflow: hidden;
+  }
+  .mascot-face {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .mascot-face-front {
+    position: relative;
+    opacity: 1;
+  }
+  .mascot-face-back {
+    opacity: 0;
+  }
+  .mascot-face-img {
+    object-fit: contain;
+    object-position: var(--pos-x, 50%) var(--pos-y, 50%);
+    transform: scale(var(--img-scale, 1));
+  }
+  .mascot-face-back .mascot-face-img {
+    object-fit: cover;
+  }
+  [data-mascot-flip-inner].is-flipped .mascot-face-front {
+    opacity: 0;
+  }
+  [data-mascot-flip-inner].is-flipped .mascot-face-back {
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    [data-mascot-select]:hover [data-mascot-flip-inner]:not(.is-flipped) .mascot-face-front,
+    label:hover [data-mascot-flip-inner]:not(.is-flipped) .mascot-face-front {
+      opacity: 0;
+    }
+    [data-mascot-select]:hover [data-mascot-flip-inner]:not(.is-flipped) .mascot-face-back,
+    label:hover [data-mascot-flip-inner]:not(.is-flipped) .mascot-face-back {
+      opacity: 1;
+    }
+  }
+</style>
