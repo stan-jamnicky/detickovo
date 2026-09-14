@@ -1,7 +1,7 @@
 ---
 name: Olaf
 photo: /uploads/illustrations/olaf-frozen.png
-realPhoto: /uploads/mascot-missing.svg
+realPhoto: /uploads/real-mascots/olaf+elsa.jpg
 category: ladove-kralovstvo
 order: 7
 ---

@@ -3,7 +3,7 @@ name: Bluey
 photo: /uploads/illustrations/bluey.png
 photoPosition:
   scale: 1.3
-realPhoto: /uploads/mascot-missing.svg
+realPhoto: /uploads/real-mascots/bluey.jpg
 category: ostatni
 order: 10
 ---
