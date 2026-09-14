@@ -14,7 +14,10 @@ const maintenance = site.maintenance ?? false;
     <title>Prepáčte, máme prestávku – {site.name}</title>
     <meta name="description" content="Web je momentálne v údržbe. Čoskoro sme späť!" />
     <meta name="robots" content="noindex, nofollow" />
-    <link rel="icon" type="image/png" href="/fav_icon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script is:inline define:vars={{ maintenance }}>
       if (!maintenance) location.replace('/');
     </script>
