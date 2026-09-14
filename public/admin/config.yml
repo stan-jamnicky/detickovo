@@ -29,7 +29,26 @@ collections:
     create: true
     fields:
       - { name: name, label: Meno, widget: string }
-      - { name: photo, label: Fotka, widget: image }
+      - { name: photo, label: Ilustrácia, widget: image }
+      - name: photoPosition
+        label: Umiestnenie ilustrácie
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { name: x, label: "Vodorovne (%)", widget: number, default: 50, value_type: int, min: 0, max: 100 }
+          - { name: y, label: "Zvisle (%)", widget: number, default: 50, value_type: int, min: 0, max: 100 }
+          - { name: scale, label: Priblíženie, widget: number, default: 1, value_type: float, min: 1, max: 3 }
+      - { name: realPhoto, label: Skutočná fotka, widget: image, required: false }
+      - name: realPhotoPosition
+        label: Umiestnenie skutočnej fotky
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { name: x, label: "Vodorovne (%)", widget: number, default: 50, value_type: int, min: 0, max: 100 }
+          - { name: y, label: "Zvisle (%)", widget: number, default: 50, value_type: int, min: 0, max: 100 }
+          - { name: scale, label: Priblíženie, widget: number, default: 1, value_type: float, min: 1, max: 3 }
       - name: category
         label: Kategória
         widget: select

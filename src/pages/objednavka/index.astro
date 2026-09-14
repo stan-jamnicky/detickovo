@@ -3,6 +3,8 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { EVENT_TYPES } from '../../lib/eventTypes';
 import site from '../../data/site.json';
+import MascotCard from '../../components/MascotCard.astro';
+import MascotZoomDialog from '../../components/MascotZoomDialog.astro';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const mascots = (await getCollection('mascots')).sort((a, b) => a.data.order - b.data.order);
@@ -244,17 +246,7 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
                 ))}
               </div>
               <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {mascots.map((m) => (
-                  <label
-                    class="group cursor-pointer overflow-hidden rounded-2xl bg-white ring-2 ring-ink/10 transition has-checked:ring-brand-blue hover:ring-brand-blue/40"
-                    data-mascot-card
-                    data-mascot-category={m.data.category}
-                  >
-                    <input type="checkbox" name="Maskoti" value={m.data.name} class="sr-only" data-mascot-check data-mascot-id={m.id} />
-                    <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="aspect-square w-full object-cover" />
-                    <span class="block p-2 text-center text-xs font-semibold transition group-has-checked:bg-brand-blue group-has-checked:text-white">{m.data.name}</span>
-                  </label>
-                ))}
+                {mascots.map((m) => <MascotCard mascot={m} mode="checkbox" />)}
               </div>
               <!-- Static Bottom Mascot Summary & Requirement Status -->
               <div data-mascot-inline-summary class="mt-4 rounded-2xl transition-all"></div>
@@ -367,6 +359,8 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
       </form>
     </div>
   </section>
+
+  <MascotZoomDialog />
 </Base>
 
 <script is:inline>

@@ -1,6 +1,7 @@
 ---
 name: Batman
-photo: /uploads/mascot-batman.svg
+photo: /uploads/illustrations/Batman.webp
+realPhoto: /uploads/mascot-missing.svg
 category: superhrdinovia
 order: 12
 ---

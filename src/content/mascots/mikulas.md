@@ -1,6 +1,9 @@
 ---
 name: Mikuláš
-photo: /uploads/mascot-mikulas.svg
+photo: /uploads/illustrations/mikulas.png
+photoPosition:
+  scale: 0.9
+realPhoto: /uploads/mascot-missing.svg
 category: ostatni
 order: 16
 ---
