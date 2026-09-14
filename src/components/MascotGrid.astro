@@ -34,10 +34,15 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   ))}
 </div>
 
-<p class="mb-4 text-sm text-muted">Ťuknutím maskota vyberiete, lupou si prezriete fotku.</p>
+<p class="mb-4 text-sm text-muted">Ťuknutím maskota vyberiete, tlačidlom „Náhľad“ uvidíte, ako vyzerá naživo.</p>
 
 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" data-mascot-grid>
-  {mascots.map((m) => (
+  {mascots.map((m) => {
+    const pos = m.data.photoPosition;
+    const frontStyle = `--pos-x:${pos?.x ?? 50}%;--pos-y:${pos?.y ?? 50}%;--img-scale:${pos?.scale ?? 1};`;
+    const realPos = m.data.realPhotoPosition;
+    const backStyle = `--pos-x:${realPos?.x ?? 50}%;--pos-y:${realPos?.y ?? 50}%;--img-scale:${realPos?.scale ?? 1};`;
+    return (
     <div class="relative" data-mascot-card data-mascot-category={m.data.category}>
       <button
         type="button"
@@ -48,14 +53,32 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
         class="group w-full overflow-hidden rounded-blob bg-white text-left ring-2 ring-ink/5 transition hover:ring-brand-blue/40 aria-pressed:ring-brand-blue"
       >
         <span class="absolute left-3 top-3 z-10 hidden h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white group-aria-pressed:flex" aria-hidden="true">✓</span>
-        <img
-          src={m.data.photo}
-          alt={m.data.name}
-          width="1200"
-          height="800"
-          loading="lazy"
-          class="aspect-square w-full object-cover"
-        />
+        <span class="mascot-flip aspect-square block w-full" data-mascot-flip-inner>
+          <span class="mascot-face mascot-face-front block h-full w-full">
+            <img
+              src={m.data.photo}
+              alt={m.data.name}
+              width="1200"
+              height="800"
+              loading="lazy"
+              style={frontStyle}
+              class="mascot-face-img h-full w-full"
+            />
+          </span>
+          {m.data.realPhoto && (
+            <span class="mascot-face mascot-face-back block h-full w-full">
+              <img
+                src={m.data.realPhoto}
+                alt={`${m.data.name} naživo`}
+                width="1200"
+                height="800"
+                loading="lazy"
+                style={backStyle}
+                class="mascot-face-img h-full w-full"
+              />
+            </span>
+          )}
+        </span>
         <span class="block p-4 text-center font-display font-bold transition group-aria-pressed:bg-brand-blue group-aria-pressed:text-white">{m.data.name}</span>
       </button>
       <button
@@ -63,10 +86,16 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
         data-mascot-zoom
         data-mascot-name={m.data.name}
         aria-label={`Zväčšiť fotku – ${m.data.name}`}
-        class="absolute right-3 top-3 z-10 flex h-8 w-8 cursor-zoom-in items-center justify-center rounded-full bg-white/90 text-sm shadow ring-1 ring-ink/10 hover:bg-white"
-      >🔍</button>
+        class="absolute right-3 top-3 z-10 flex cursor-zoom-in items-center gap-1 rounded-full bg-white/90 px-2.5 py-1.5 text-xs font-semibold shadow ring-1 ring-ink/10 hover:bg-white"
+      >
+        Náhľad
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 4H4v5m0 6v5h5m6 0h5v-5m0-6V4h-5" />
+        </svg>
+      </button>
     </div>
-  ))}
+    );
+  })}
 </div>
 
 <!-- Bottom gradient shadow vignette when selection floating bar is active -->
@@ -114,8 +143,9 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
 >
   <!-- Static Top Bar -->
   <header class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-ink/10 bg-white/90 px-4 sm:px-6 backdrop-blur-md select-none">
-    <!-- Top left: Mascot name -->
-    <div class="flex items-center min-w-0 pr-3">
+    <!-- Top left: Mascot avatar + name -->
+    <div class="flex items-center min-w-0 gap-2 pr-3">
+      <img class="h-8 w-8 shrink-0 rounded-full bg-sand/60 object-contain ring-1 ring-ink/10" data-mascot-caption-avatar alt="" />
       <h3 class="font-display text-lg sm:text-2xl font-bold text-ink truncate" data-mascot-caption></h3>
     </div>
 
@@ -185,6 +215,48 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   </div>
 </dialog>
 
+<style>
+  .mascot-flip {
+    position: relative;
+    overflow: hidden;
+  }
+  .mascot-face {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .mascot-face-front {
+    position: relative;
+    opacity: 1;
+  }
+  .mascot-face-back {
+    opacity: 0;
+  }
+  .mascot-face-img {
+    object-fit: contain;
+    object-position: var(--pos-x, 50%) var(--pos-y, 50%);
+    transform: scale(var(--img-scale, 1));
+  }
+  .mascot-face-back .mascot-face-img {
+    object-fit: cover;
+  }
+  [data-mascot-flip-inner].is-flipped .mascot-face-front {
+    opacity: 0;
+  }
+  [data-mascot-flip-inner].is-flipped .mascot-face-back {
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    [data-mascot-select]:hover [data-mascot-flip-inner]:not(.is-flipped) .mascot-face-front {
+      opacity: 0;
+    }
+    [data-mascot-select]:hover [data-mascot-flip-inner]:not(.is-flipped) .mascot-face-back {
+      opacity: 1;
+    }
+  }
+</style>
+
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-mascot-filter]');
   const cards = document.querySelectorAll<HTMLElement>('[data-mascot-card]');
@@ -234,7 +306,7 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
       const img = document.createElement('img');
       img.src = src;
       img.alt = card?.dataset.mascotName ?? '';
-      img.className = 'h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 border-white object-cover shadow-sm';
+      img.className = 'h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 border-white object-contain bg-white shadow-sm';
       avatars.appendChild(img);
     });
     if (ids.length > MAX_AVATARS) {
@@ -288,10 +360,12 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
     });
   });
 
+
   const dialog = document.querySelector<HTMLDialogElement>('[data-mascot-dialog]')!;
   const viewport = dialog.querySelector<HTMLElement>('[data-mascot-viewport]')!;
   const img = dialog.querySelector<HTMLImageElement>('[data-mascot-img]')!;
   const caption = dialog.querySelector<HTMLElement>('[data-mascot-caption]')!;
+  const captionAvatar = dialog.querySelector<HTMLImageElement>('[data-mascot-caption-avatar]')!;
   const zoomInBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-in]');
   const zoomOutBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-out]');
   const zoomResetBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-reset]');
@@ -463,16 +537,18 @@ const usedCategories = CATEGORIES.filter((c) => mascots.some((m) => m.data.categ
   zoomOutBtn?.addEventListener('click', () => zoomAround(1 / 1.35, undefined, undefined, true));
   zoomResetBtn?.addEventListener('click', () => resetZoom(true));
 
-  // Open mascot preview dialog
+  // Open mascot preview dialog — always prefer the real photo over the illustration
   document.querySelectorAll<HTMLButtonElement>('[data-mascot-zoom]').forEach((zoom) => {
     zoom.addEventListener('click', () => {
       const card = zoom.closest('[data-mascot-card]')!;
-      const mascotImg = card.querySelector('img');
-      if (mascotImg) {
-        img.src = mascotImg.src;
-      }
+      const frontImg = card.querySelector<HTMLImageElement>('.mascot-face-front img');
+      const backImg = card.querySelector<HTMLImageElement>('.mascot-face-back img');
       img.alt = zoom.dataset.mascotName ?? '';
       caption.textContent = zoom.dataset.mascotName ?? '';
+      captionAvatar.src = frontImg?.src ?? '';
+      captionAvatar.alt = '';
+      img.src = backImg?.src ?? frontImg?.src ?? '';
+
       resetZoom(false);
       dialog.showModal();
     });

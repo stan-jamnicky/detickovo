@@ -1,6 +1,9 @@
 ---
 name: Snehulienka
-photo: /uploads/mascot-snehulienka.svg
+photo: /uploads/illustrations/snehulienka.png
+photoPosition:
+  scale: 0.9
+realPhoto: /uploads/mascot-missing.svg
 category: disney
 order: 25
 ---
