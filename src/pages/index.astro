@@ -118,10 +118,10 @@ const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.orde
         <div class="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
           <div class="flex shrink-0 -space-x-3">
             {mascotTeaser.map((m) => (
-              <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="h-12 w-12 rounded-full border-2 border-white object-cover" />
+              <img src={m.data.photo} alt={m.data.name} width="1200" height="800" loading="lazy" class="h-12 w-12 rounded-full border-2 border-white object-contain" />
             ))}
           </div>
-          <p class="font-display font-bold">20+ maskotov – od Labkovej patroly po Ľadové kráľovstvo</p>
+          <p class="font-display font-bold">25+ maskotov – obľúbené rozprávkové postavičky a superhrdinovia</p>
         </div>
         <a href="/maskoti" class="btn-primary shrink-0">Pozrieť maskotov</a>
       </div>
