@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 import Confetti from '../components/Confetti.astro';
 import EventTypeTiles from '../components/EventTypeTiles.astro';
 import ServiceGrid from '../components/ServiceGrid.astro';
-import EventCard from '../components/EventCard.astro';
+import EventCarousel from '../components/EventCarousel.astro';
 import StatBand from '../components/StatBand.astro';
 import ReferenceRow from '../components/ReferenceRow.astro';
 import CTASection from '../components/CTASection.astro';
@@ -128,47 +128,7 @@ const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.orde
     </div>
   </section>
 
-  <!-- Recent events -->
-  <section class="section bg-cream">
-    <div class="container-site">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <span class="kicker">Príbehy z akcií</span>
-          <h2 class="text-3xl sm:text-4xl">Nedávne akcie</h2>
-        </div>
-        <a href="/akcie" class="btn-secondary !px-5 !py-2.5 text-sm">Všetky akcie</a>
-      </div>
-      <div class="relative mt-10">
-        <button
-          type="button"
-          id="events-prev"
-          aria-label="Predchádzajúce akcie"
-          class="absolute -left-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink shadow-lg shadow-ink/10 ring-1 ring-ink/10 transition hover:ring-brand-blue disabled:opacity-40 disabled:hover:ring-ink/10 sm:flex lg:-left-6"
-        >←</button>
-        <button
-          type="button"
-          id="events-next"
-          aria-label="Ďalšie akcie"
-          class="absolute -right-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink shadow-lg shadow-ink/10 ring-1 ring-ink/10 transition hover:ring-brand-blue disabled:opacity-40 disabled:hover:ring-ink/10 sm:flex lg:-right-6"
-        >→</button>
-        <div
-          id="events-track"
-          class="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {recent.map((event, index) => (
-            <div class="w-[86%] shrink-0 snap-start sm:w-[47%] lg:w-[calc((100%-3rem)/3)]">
-              <EventCard event={event} index={index} />
-            </div>
-          ))}
-        </div>
-        <div id="events-dots" class="mt-6 flex justify-center gap-2" role="tablist" aria-label="Stránky karuselu"></div>
-      </div>
-      <div class="mt-10 flex flex-wrap justify-center gap-3">
-        <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
-        <a href="/akcie" class="btn-secondary">Naše akcie</a>
-      </div>
-    </div>
-  </section>
+  <EventCarousel events={recent} title="Nedávne akcie" />
 
   <!-- Why Detičkovo -->
   <section class="section">
@@ -195,52 +155,3 @@ const mascotTeaser = (await getCollection('mascots')).sort((a, b) => a.data.orde
   <CTASection />
 </Base>
 
-<script>
-  const track = document.getElementById('events-track') as HTMLElement;
-  const prev = document.getElementById('events-prev') as HTMLButtonElement;
-  const next = document.getElementById('events-next') as HTMLButtonElement;
-  const dots = document.getElementById('events-dots') as HTMLElement;
-
-  const step = () => (track.firstElementChild?.getBoundingClientRect().width ?? 300) + 24;
-  const pageCount = () => Math.round((track.scrollWidth - track.clientWidth) / step()) + 1;
-  const activePage = () => Math.min(Math.round(track.scrollLeft / step()), pageCount() - 1);
-
-  prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
-  next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
-
-  const buildDots = () => {
-    dots.innerHTML = '';
-    for (let i = 0; i < pageCount(); i++) {
-      const dot = document.createElement('button');
-      dot.type = 'button';
-      dot.setAttribute('aria-label', `Stránka ${i + 1}`);
-      dot.className = 'h-2.5 rounded-full transition-all duration-300';
-      dot.addEventListener('click', () => track.scrollTo({ left: i * step(), behavior: 'smooth' }));
-      dots.appendChild(dot);
-    }
-  };
-
-  const update = () => {
-    prev.disabled = track.scrollLeft <= 4;
-    next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 4;
-    const current = activePage();
-    [...dots.children].forEach((dot, i) => {
-      dot.className = `h-2.5 rounded-full transition-all duration-300 ${
-        i === current ? 'w-6 bg-brand-blue' : 'w-2.5 bg-ink/15 hover:bg-ink/30'
-      }`;
-      dot.setAttribute('aria-current', String(i === current));
-    });
-  };
-
-  buildDots();
-  update();
-  track.addEventListener('scroll', update, { passive: true });
-  window.addEventListener(
-    'resize',
-    () => {
-      buildDots();
-      update();
-    },
-    { passive: true }
-  );
-</script>

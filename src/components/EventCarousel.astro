@@ -1,0 +1,93 @@
+---
+import EventCard from './EventCard.astro';
+import type { EventPost } from '../lib/eventPosts';
+
+interface Props {
+  events: EventPost[];
+  id?: string;
+  eyebrow?: string;
+  title: string;
+  allHref?: string;
+}
+
+const {
+  events,
+  id,
+  eyebrow = 'Príbehy z akcií',
+  title,
+  allHref = '/akcie',
+} = Astro.props;
+const carouselId = `events-${Math.random().toString(36).slice(2, 9)}`;
+const visibleEvents = events.slice(0, 12);
+---
+
+<section id={id} class="section bg-cream" data-event-carousel={carouselId}>
+  <div class="container-site">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <span class="kicker">{eyebrow}</span>
+        <h2 class="text-3xl sm:text-4xl">{title}</h2>
+      </div>
+      <a href={allHref} class="btn-secondary !px-5 !py-2.5 text-sm">Všetky akcie</a>
+    </div>
+    <div class="relative mt-10">
+      <button type="button" data-events-prev aria-label="Predchádzajúce akcie" class="absolute -left-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink shadow-lg shadow-ink/10 ring-1 ring-ink/10 transition hover:ring-brand-blue disabled:opacity-40 disabled:hover:ring-ink/10 sm:flex lg:-left-6">←</button>
+      <button type="button" data-events-next aria-label="Ďalšie akcie" class="absolute -right-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink shadow-lg shadow-ink/10 ring-1 ring-ink/10 transition hover:ring-brand-blue disabled:opacity-40 disabled:hover:ring-ink/10 sm:flex lg:-right-6">→</button>
+      <div data-events-track class="flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {visibleEvents.map((event, index) => (
+          <div class="w-[86%] shrink-0 snap-start sm:w-[47%] lg:w-[calc((100%-3rem)/3)]">
+            <EventCard event={event} index={index} />
+          </div>
+        ))}
+      </div>
+      <div data-events-dots class="mt-6 flex justify-center gap-2" role="tablist" aria-label="Stránky karuselu"></div>
+    </div>
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-event-carousel]').forEach((carousel) => {
+    const track = carousel.querySelector<HTMLElement>('[data-events-track]');
+    const prev = carousel.querySelector<HTMLButtonElement>('[data-events-prev]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-events-next]');
+    const dots = carousel.querySelector<HTMLElement>('[data-events-dots]');
+    if (!track || !prev || !next || !dots || !track.firstElementChild) return;
+
+    const step = () => (track.firstElementChild?.getBoundingClientRect().width ?? 300) + 24;
+    const pageCount = () => Math.max(1, Math.round((track.scrollWidth - track.clientWidth) / step()) + 1);
+    const activePage = () => Math.min(Math.round(track.scrollLeft / step()), pageCount() - 1);
+
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+
+    const buildDots = () => {
+      dots.innerHTML = '';
+      for (let i = 0; i < pageCount(); i++) {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `Stránka ${i + 1}`);
+        dot.className = 'h-2.5 rounded-full transition-all duration-300';
+        dot.addEventListener('click', () => track.scrollTo({ left: i * step(), behavior: 'smooth' }));
+        dots.appendChild(dot);
+      }
+    };
+
+    const update = () => {
+      prev.disabled = track.scrollLeft <= 4;
+      next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 4;
+      const current = activePage();
+      [...dots.children].forEach((dot, i) => {
+        dot.className = `h-2.5 rounded-full transition-all duration-300 ${i === current ? 'w-6 bg-brand-blue' : 'w-2.5 bg-ink/15 hover:bg-ink/30'}`;
+        dot.setAttribute('aria-current', String(i === current));
+      });
+    };
+
+    buildDots();
+    update();
+    track.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', () => { buildDots(); update(); }, { passive: true });
+  });
+</script>

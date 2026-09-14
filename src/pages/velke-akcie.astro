@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import ServiceGrid from '../components/ServiceGrid.astro';
 import ReferenceRow from '../components/ReferenceRow.astro';
 import CTASection from '../components/CTASection.astro';
+import EventCarousel from '../components/EventCarousel.astro';
+import { listEventPosts } from '../lib/eventPosts';
 
 const scenarios = [
   { title: 'Deň detí pre mesto či obec', text: 'Kompletné popoludnie so stanovišťami, súťažami, maskotmi a moderovaním – pre 100 až 1000 detí.', color: 'bg-brand-blue' },
@@ -17,6 +19,8 @@ const steps = [
   { n: '3', title: 'Doladíme detaily', text: 'Spoločne upravíme program, harmonogram a technické požiadavky.' },
   { n: '4', title: 'Prídeme a zabavíme', text: 'V deň akcie prídeme s tímom aj technikou. Vy sa už o nič nestaráte.' },
 ];
+const largeEventTypes = new Set(['mesto-obec', 'firma', 'skola-skolka', 'festival']);
+const events = (await listEventPosts()).filter((event) => largeEventTypes.has(event.eventType));
 ---
 
 <Base
@@ -80,16 +84,12 @@ const steps = [
     </div>
   </section>
 
-  <section id="akcie" class="section bg-cream">
-    <div class="container-site">
-      <span class="kicker">Nechajte sa inšpirovať</span>
-      <h2 class="max-w-xl text-3xl sm:text-4xl">Takto vyzerajú naše veľké akcie</h2>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href="/objednavka" class="btn-primary">Overiť dostupnosť termínu</a>
-        <a href="/akcie" class="btn-secondary">Naše akcie</a>
-      </div>
-    </div>
-  </section>
+  <EventCarousel
+    id="akcie"
+    events={events}
+    eyebrow="Nechajte sa inšpirovať"
+    title="Takto vyzerajú naše veľké akcie"
+  />
 
   <section class="section">
     <div class="container-site">
