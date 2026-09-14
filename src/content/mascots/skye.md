@@ -1,7 +1,7 @@
 ---
 name: Skye
 photo: /uploads/illustrations/skye.webp
-realPhoto: /uploads/mascot-missing.svg
+realPhoto: /uploads/real-mascots/chase+skye.jpg
 category: labkova-patrola
 order: 4
 ---

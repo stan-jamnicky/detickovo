@@ -1,7 +1,7 @@
 ---
 name: Marshall
 photo: /uploads/illustrations/marshall.webp
-realPhoto: /uploads/mascot-missing.svg
+realPhoto: /uploads/real-mascots/marshall.jpg
 category: labkova-patrola
 order: 5
 ---
