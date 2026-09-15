@@ -3,80 +3,102 @@
 
 <dialog
   data-mascot-dialog
-  class="hidden open:flex open:flex-col fixed inset-0 m-0 h-dvh w-dvw max-h-none max-w-none border-0 bg-white/95 p-0 text-ink backdrop:bg-white/95 overflow-hidden z-50"
+  class="hidden open:flex open:flex-col fixed inset-0 m-0 h-dvh w-dvw max-h-none max-w-none border-0 bg-white/60 p-0 text-ink backdrop:bg-white/35 backdrop:backdrop-blur-md backdrop-blur-md overflow-hidden z-50"
   aria-label="Detail maskota"
 >
-  <!-- Static Top Bar -->
-  <header class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-ink/10 bg-white/90 px-4 sm:px-6 backdrop-blur-md select-none">
-    <!-- Top left: Mascot avatar + name -->
-    <div class="flex items-center min-w-0 gap-2 pr-3">
-      <img class="h-8 w-8 shrink-0 rounded-full bg-sand/60 object-contain ring-1 ring-ink/10" data-mascot-caption-avatar alt="" />
-      <h3 class="font-display text-lg sm:text-2xl font-bold text-ink truncate" data-mascot-caption></h3>
-    </div>
-
-    <!-- Top right: Zoom controls + Close button -->
-    <div class="flex items-center gap-2 shrink-0">
-      <div class="flex items-center rounded-full bg-sand/80 p-1 ring-1 ring-ink/10" role="group" aria-label="Ovládanie priblíženia">
-        <button
-          type="button"
-          data-mascot-zoom-out
-          class="flex h-8 w-8 items-center justify-center rounded-full text-ink/70 hover:bg-white hover:text-ink transition cursor-pointer"
-          aria-label="Oddialiť"
-          title="Oddialiť (−)"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
-        </button>
-        <button
-          type="button"
-          data-mascot-zoom-reset
-          class="px-2 h-8 text-xs font-mono font-semibold text-ink/80 hover:text-ink transition cursor-pointer rounded-full hover:bg-white/60"
-          aria-label="Obnoviť priblíženie"
-          title="Obnoviť na 100%"
-        >
-          <span data-mascot-zoom-level>100%</span>
-        </button>
-        <button
-          type="button"
-          data-mascot-zoom-in
-          class="flex h-8 w-8 items-center justify-center rounded-full text-ink/70 hover:bg-white hover:text-ink transition cursor-pointer"
-          aria-label="Priblížiť"
-          title="Priblížiť (+)"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-        </button>
-      </div>
-
+  <div class="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-start justify-between p-3 sm:p-5 select-none">
+    <div class="pointer-events-auto flex items-center rounded-full bg-white/85 p-1 shadow-lg shadow-ink/10 ring-1 ring-ink/10 backdrop-blur-md" role="group" aria-label="Ovládanie priblíženia" data-mascot-ui>
       <button
         type="button"
-        data-mascot-close
-        class="flex h-10 w-10 items-center justify-center rounded-full bg-sand/80 text-ink hover:bg-sand transition cursor-pointer ring-1 ring-ink/10 ml-1"
-        aria-label="Zavrieť detail maskota"
-        title="Zavrieť (Esc)"
+        data-mascot-zoom-out
+        class="flex h-9 w-9 items-center justify-center rounded-full text-ink/70 transition hover:bg-sand hover:text-ink cursor-pointer"
+        aria-label="Oddialiť"
+        title="Oddialiť (−)"
       >
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg>
+      </button>
+      <button
+        type="button"
+        data-mascot-zoom-reset
+        class="h-9 rounded-full px-2.5 font-mono text-xs font-semibold text-ink/80 transition hover:bg-sand hover:text-ink cursor-pointer"
+        aria-label="Obnoviť priblíženie"
+        title="Obnoviť na 100%"
+      >
+        <span data-mascot-zoom-level>100%</span>
+      </button>
+      <button
+        type="button"
+        data-mascot-zoom-in
+        class="flex h-9 w-9 items-center justify-center rounded-full text-ink/70 transition hover:bg-sand hover:text-ink cursor-pointer"
+        aria-label="Priblížiť"
+        title="Priblížiť (+)"
+      >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
       </button>
     </div>
-  </header>
+
+    <button
+      type="button"
+      data-mascot-close
+      data-mascot-ui
+      class="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-ink shadow-lg shadow-ink/10 ring-1 ring-ink/10 backdrop-blur-md transition hover:bg-white hover:scale-105 cursor-pointer"
+      aria-label="Zavrieť detail maskota"
+      title="Zavrieť (Esc)"
+    >
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
 
   <!-- Interactive Image Viewport -->
   <div
-    class="relative flex-1 w-full h-[calc(100dvh-4rem)] overflow-hidden flex items-center justify-center touch-none select-none bg-cream/40"
+    class="relative flex-1 w-full h-dvh overflow-hidden flex items-center justify-center touch-none select-none bg-white/25 backdrop-blur-md px-4 pb-28 pt-20 sm:pb-34 sm:pt-24"
     data-mascot-viewport
   >
+    <button
+      type="button"
+      data-mascot-prev
+      data-mascot-ui
+      class="absolute left-3 top-1/2 z-20 hidden h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-ink shadow-xl shadow-ink/10 ring-1 ring-ink/10 backdrop-blur-md transition hover:bg-white hover:-translate-x-1 disabled:pointer-events-none disabled:opacity-0 md:flex lg:left-6"
+      aria-label="Predchádzajúci maskot"
+      title="Predchádzajúci maskot"
+    >
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
     <img
       src=""
       alt=""
-      class="max-h-[85vh] max-w-[90vw] object-contain pointer-events-none select-none will-change-transform rounded-xl shadow-xl ring-1 ring-ink/5"
+      class="max-h-[calc(100dvh-11rem)] max-w-[92vw] object-contain pointer-events-none select-none will-change-transform rounded-2xl shadow-2xl shadow-ink/15 ring-1 ring-ink/5 sm:max-h-[calc(100dvh-12rem)]"
       data-mascot-img
       draggable="false"
     />
 
-    <!-- Bottom Helper Hint -->
-    <div class="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-3.5 py-1.5 text-xs text-ink/70 shadow-sm backdrop-blur-md ring-1 ring-ink/10 transition-opacity duration-300">
-      <span>Kolieskom myši alebo gestom prstov priblížite</span>
-    </div>
+    <button
+      type="button"
+      data-mascot-next
+      data-mascot-ui
+      class="absolute right-3 top-1/2 z-20 hidden h-14 w-14 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-ink shadow-xl shadow-ink/10 ring-1 ring-ink/10 backdrop-blur-md transition hover:bg-white hover:translate-x-1 disabled:pointer-events-none disabled:opacity-0 md:flex lg:right-6"
+      aria-label="Ďalší maskot"
+      title="Ďalší maskot"
+    >
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+
+    <nav
+      data-mascot-ui
+      data-mascot-carousel
+      class="pointer-events-auto absolute inset-x-0 bottom-1 z-30 mx-auto flex w-full max-w-2xl flex-col items-center px-3 sm:bottom-3"
+      aria-label="Výber maskota"
+    >
+      <div class="relative h-28 w-full max-w-132 sm:h-32" data-mascot-avatars></div>
+      <div class="relative z-40 -mt-7 max-w-[min(24rem,90vw)] rounded-full bg-white/92 px-4 py-1.5 text-center font-display text-sm font-bold leading-tight text-ink shadow-lg shadow-ink/10 ring-1 ring-ink/10 backdrop-blur-md sm:-mt-8 sm:text-base" data-mascot-current-name></div>
+    </nav>
   </div>
 </dialog>
 
@@ -84,17 +106,29 @@
   const dialog = document.querySelector<HTMLDialogElement>('[data-mascot-dialog]')!;
   const viewport = dialog.querySelector<HTMLElement>('[data-mascot-viewport]')!;
   const img = dialog.querySelector<HTMLImageElement>('[data-mascot-img]')!;
-  const caption = dialog.querySelector<HTMLElement>('[data-mascot-caption]')!;
-  const captionAvatar = dialog.querySelector<HTMLImageElement>('[data-mascot-caption-avatar]')!;
   const zoomInBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-in]');
   const zoomOutBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-out]');
   const zoomResetBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-zoom-reset]');
   const zoomLevel = dialog.querySelector<HTMLElement>('[data-mascot-zoom-level]');
   const closeBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-close]');
+  const prevBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-prev]');
+  const nextBtn = dialog.querySelector<HTMLButtonElement>('[data-mascot-next]');
+  const avatarTrack = dialog.querySelector<HTMLElement>('[data-mascot-avatars]')!;
+  const currentName = dialog.querySelector<HTMLElement>('[data-mascot-current-name]')!;
+
+  type MascotItem = {
+    card: HTMLElement;
+    id: string;
+    name: string;
+    avatarSrc: string;
+    previewSrc: string;
+  };
 
   let scale = 1;
   let translateX = 0;
   let translateY = 0;
+  let activeMascots: MascotItem[] = [];
+  let currentIndex = -1;
   const MIN_SCALE = 1;
   const MAX_SCALE = 5;
 
@@ -103,6 +137,146 @@
   let prevPinchCenter = { x: 0, y: 0 };
   let isDragging = false;
   let dragMoved = false;
+  let gestureStart: { pointerId: number; x: number; y: number; pointerType: string } | null = null;
+  let gestureWasPinch = false;
+
+  function readMascot(card: HTMLElement): MascotItem | null {
+    const zoom = card.querySelector<HTMLButtonElement>('[data-mascot-zoom]');
+    const selectable = card.querySelector<HTMLElement>('[data-mascot-select], [data-mascot-check]');
+    const frontImg = card.querySelector<HTMLImageElement>('.mascot-face-front img');
+    const backImg = card.querySelector<HTMLImageElement>('.mascot-face-back img');
+    const name = zoom?.dataset.mascotName ?? selectable?.dataset.mascotName ?? frontImg?.alt ?? '';
+    const avatarSrc = frontImg?.src ?? '';
+    const previewSrc = backImg?.src ?? avatarSrc;
+
+    if (!name || !avatarSrc || !previewSrc) return null;
+
+    return {
+      card,
+      id: selectable?.dataset.mascotId ?? name,
+      name,
+      avatarSrc,
+      previewSrc,
+    };
+  }
+
+  function getVisibleMascots() {
+    return Array.from(document.querySelectorAll<HTMLElement>('[data-mascot-card]'))
+      .filter((card) => getComputedStyle(card).display !== 'none')
+      .map(readMascot)
+      .filter((mascot): mascot is MascotItem => Boolean(mascot));
+  }
+
+  function setButtonState(button: HTMLButtonElement | null, disabled: boolean, label: string) {
+    if (!button) return;
+    button.disabled = disabled;
+    button.setAttribute('aria-label', label);
+    button.title = label;
+  }
+
+  function renderCarousel() {
+    avatarTrack.innerHTML = '';
+    const currentMascot = activeMascots[currentIndex];
+    if (!currentMascot) {
+      currentName.textContent = '';
+      setButtonState(prevBtn, true, 'Predchádzajúci maskot');
+      setButtonState(nextBtn, true, 'Ďalší maskot');
+      return;
+    }
+
+    currentName.textContent = currentMascot.name;
+
+    const previousMascot = activeMascots[currentIndex - 1];
+    const nextMascot = activeMascots[currentIndex + 1];
+    setButtonState(prevBtn, !previousMascot, previousMascot ? `Predchádzajúci maskot: ${previousMascot.name}` : 'Predchádzajúci maskot');
+    setButtonState(nextBtn, !nextMascot, nextMascot ? `Ďalší maskot: ${nextMascot.name}` : 'Ďalší maskot');
+
+    const start = Math.max(0, currentIndex - 2);
+    const end = Math.min(activeMascots.length - 1, currentIndex + 2);
+
+    for (let index = start; index <= end; index += 1) {
+      const mascot = activeMascots[index];
+      const offset = index - currentIndex;
+      const button = document.createElement('button');
+      const frame = document.createElement('span');
+      const avatar = document.createElement('img');
+      const isCurrent = index === currentIndex;
+
+      button.type = 'button';
+      button.className = `mascot-orbit-item${isCurrent ? ' is-current' : ''}`;
+      button.dataset.offset = String(offset);
+      button.dataset.mascotUi = '';
+      button.setAttribute('aria-label', isCurrent ? `${mascot.name} je otvorený` : `Zobraziť maskota ${mascot.name}`);
+      if (isCurrent) {
+        button.setAttribute('aria-current', 'true');
+      }
+      button.addEventListener('click', () => {
+        if (index === currentIndex) return;
+        showMascot(index, index > currentIndex ? 1 : -1);
+      });
+
+      frame.className = 'mascot-orbit-frame';
+      avatar.src = mascot.avatarSrc;
+      avatar.alt = '';
+      avatar.loading = 'lazy';
+      avatar.draggable = false;
+
+      frame.appendChild(avatar);
+      button.appendChild(frame);
+      avatarTrack.appendChild(button);
+    }
+  }
+
+  function showMascot(index: number, direction = 0) {
+    const mascot = activeMascots[index];
+    if (!mascot) return;
+
+    currentIndex = index;
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    isDragging = false;
+    dragMoved = false;
+    pointers.clear();
+    prevPinchDist = 0;
+    gestureStart = null;
+    gestureWasPinch = false;
+
+    img.alt = mascot.name;
+    img.src = mascot.previewSrc;
+    if (zoomLevel) zoomLevel.textContent = '100%';
+    viewport.style.cursor = 'default';
+
+    if (direction !== 0) {
+      const startX = direction > 0 ? 110 : -110;
+      img.style.transition = 'none';
+      img.style.transform = `translate3d(${startX}px, 0, 0) scale(1)`;
+      requestAnimationFrame(() => {
+        img.style.transition = 'transform 0.34s cubic-bezier(0.16, 1, 0.3, 1)';
+        img.style.transform = 'translate3d(0, 0, 0) scale(1)';
+      });
+    } else {
+      clampAndApply(false);
+    }
+
+    renderCarousel();
+  }
+
+  function openMascot(card: HTMLElement) {
+    activeMascots = getVisibleMascots();
+    const index = activeMascots.findIndex((mascot) => mascot.card === card);
+    if (index < 0) return;
+
+    showMascot(index, 0);
+    dialog.showModal();
+  }
+
+  function navigateMascot(delta: number) {
+    if (scale > 1.001) return;
+    const nextIndex = currentIndex + delta;
+    if (nextIndex < 0 || nextIndex >= activeMascots.length) return;
+    showMascot(nextIndex, delta > 0 ? 1 : -1);
+  }
 
   function clampAndApply(animate = false) {
     if (scale <= 1.001) {
@@ -175,13 +349,19 @@
 
   // Pointer events (Pan on PC & Pinch-to-zoom on touch devices)
   viewport.addEventListener('pointerdown', (e) => {
+    if ((e.target as Element | null)?.closest('[data-mascot-ui]')) return;
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     viewport.setPointerCapture(e.pointerId);
+    if (pointers.size === 0) {
+      gestureStart = { pointerId: e.pointerId, x: e.clientX, y: e.clientY, pointerType: e.pointerType };
+      gestureWasPinch = false;
+    }
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     isDragging = true;
     dragMoved = false;
 
     if (pointers.size === 2) {
+      gestureWasPinch = true;
       const [p1, p2] = Array.from(pointers.values());
       prevPinchDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
       prevPinchCenter = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
@@ -225,6 +405,8 @@
   });
 
   const handlePointerEnd = (e: PointerEvent) => {
+    let navigatedBySwipe = false;
+
     if (pointers.has(e.pointerId)) {
       pointers.delete(e.pointerId);
       try {
@@ -236,7 +418,20 @@
     }
     if (pointers.size === 0) {
       isDragging = false;
-      clampAndApply(true);
+      if (gestureStart?.pointerId === e.pointerId && gestureStart.pointerType !== 'mouse' && !gestureWasPinch && scale <= 1.001) {
+        const dx = e.clientX - gestureStart.x;
+        const dy = e.clientY - gestureStart.y;
+        const threshold = Math.min(72, viewport.clientWidth * 0.2);
+        if (Math.abs(dx) >= threshold && Math.abs(dy) <= 80) {
+          navigateMascot(dx < 0 ? 1 : -1);
+          navigatedBySwipe = true;
+        }
+      }
+      gestureStart = null;
+      gestureWasPinch = false;
+      if (!navigatedBySwipe) {
+        clampAndApply(true);
+      }
     }
   };
 
@@ -256,30 +451,31 @@
   zoomInBtn?.addEventListener('click', () => zoomAround(1.35, undefined, undefined, true));
   zoomOutBtn?.addEventListener('click', () => zoomAround(1 / 1.35, undefined, undefined, true));
   zoomResetBtn?.addEventListener('click', () => resetZoom(true));
+  prevBtn?.addEventListener('click', () => navigateMascot(-1));
+  nextBtn?.addEventListener('click', () => navigateMascot(1));
 
   // Open mascot preview dialog — always prefer the real photo over the illustration
   document.querySelectorAll<HTMLButtonElement>('[data-mascot-zoom]').forEach((zoom) => {
     zoom.addEventListener('click', () => {
       const card = zoom.closest('[data-mascot-card]')!;
-      const frontImg = card.querySelector<HTMLImageElement>('.mascot-face-front img');
-      const backImg = card.querySelector<HTMLImageElement>('.mascot-face-back img');
-      img.alt = zoom.dataset.mascotName ?? '';
-      caption.textContent = zoom.dataset.mascotName ?? '';
-      captionAvatar.src = frontImg?.src ?? '';
-      captionAvatar.alt = '';
-      img.src = backImg?.src ?? frontImg?.src ?? '';
-
-      resetZoom(false);
-      dialog.showModal();
+      openMascot(card as HTMLElement);
     });
   });
 
   // Close handlers
   closeBtn?.addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', () => resetZoom(false));
+  dialog.addEventListener('close', () => {
+    activeMascots = [];
+    currentIndex = -1;
+    avatarTrack.innerHTML = '';
+    currentName.textContent = '';
+    resetZoom(false);
+  });
 
   // Keyboard controls
-  dialog.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', (e) => {
+    if (!dialog.open) return;
+
     if (e.key === '+' || e.key === '=') {
       e.preventDefault();
       zoomAround(1.3, undefined, undefined, true);
@@ -289,6 +485,155 @@
     } else if (e.key === '0') {
       e.preventDefault();
       resetZoom(true);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      navigateMascot(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      navigateMascot(1);
     }
   });
 </script>
+
+<style is:global>
+  .mascot-orbit-item {
+    --orbit-x: 0rem;
+    --orbit-y: 0rem;
+    --orbit-scale: 1;
+    --orbit-z: 1;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: var(--orbit-z);
+    display: flex;
+    height: 4.65rem;
+    width: 4.65rem;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    transform: translate(calc(-50% + var(--orbit-x)), var(--orbit-y)) scale(var(--orbit-scale));
+    transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease;
+  }
+
+  .mascot-orbit-item[data-offset='-2'] {
+    --orbit-x: -12.8rem;
+    --orbit-y: 3.75rem;
+    --orbit-scale: 0.78;
+  }
+
+  .mascot-orbit-item[data-offset='-1'] {
+    --orbit-x: -6.5rem;
+    --orbit-y: 1.85rem;
+    --orbit-scale: 0.94;
+    --orbit-z: 2;
+  }
+
+  .mascot-orbit-item[data-offset='0'] {
+    --orbit-y: -0.85rem;
+    --orbit-scale: 1;
+    --orbit-z: 4;
+  }
+
+  .mascot-orbit-item[data-offset='1'] {
+    --orbit-x: 6.5rem;
+    --orbit-y: 1.85rem;
+    --orbit-scale: 0.94;
+    --orbit-z: 2;
+  }
+
+  .mascot-orbit-item[data-offset='2'] {
+    --orbit-x: 12.8rem;
+    --orbit-y: 3.75rem;
+    --orbit-scale: 0.78;
+  }
+
+  .mascot-orbit-frame {
+    display: block;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 999px;
+    background: white;
+    box-shadow: 0 16px 36px rgba(38, 33, 28, 0.18), 0 0 0 2px white, 0 0 0 3px rgba(38, 33, 28, 0.1);
+  }
+
+  .mascot-orbit-frame img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: white;
+  }
+
+  .mascot-orbit-item:hover {
+    transform: translate(calc(-50% + var(--orbit-x)), calc(var(--orbit-y) - 0.22rem)) scale(calc(var(--orbit-scale) * 1.04));
+  }
+
+  .mascot-orbit-item.is-current {
+    cursor: default;
+    height: 5.85rem;
+    width: 5.85rem;
+  }
+
+  .mascot-orbit-item.is-current .mascot-orbit-frame {
+    background: white;
+    box-shadow: 0 22px 50px color-mix(in srgb, var(--color-brand-blue) 24%, transparent), 0 0 0 4px rgba(255, 255, 255, 0.98), 0 0 0 9px var(--color-brand-blue);
+  }
+
+  .mascot-orbit-item.is-current::after {
+    content: '';
+    position: absolute;
+    bottom: -0.15rem;
+    left: 50%;
+    height: 0.58rem;
+    width: 0.58rem;
+    border-radius: 999px;
+    background: var(--color-brand-blue);
+    box-shadow: 0 0 0 3px white;
+    transform: translateX(-50%);
+  }
+
+  @media (max-width: 480px) {
+    .mascot-orbit-item {
+      height: 3.55rem;
+      width: 3.55rem;
+    }
+
+    .mascot-orbit-item[data-offset='-2'] {
+      --orbit-x: -8.55rem;
+      --orbit-y: 3.05rem;
+      --orbit-scale: 0.72;
+    }
+
+    .mascot-orbit-item[data-offset='-1'] {
+      --orbit-x: -4.45rem;
+      --orbit-y: 1.5rem;
+      --orbit-scale: 0.88;
+    }
+
+    .mascot-orbit-item[data-offset='1'] {
+      --orbit-x: 4.45rem;
+      --orbit-y: 1.5rem;
+      --orbit-scale: 0.88;
+    }
+
+    .mascot-orbit-item[data-offset='2'] {
+      --orbit-x: 8.55rem;
+      --orbit-y: 3.05rem;
+      --orbit-scale: 0.72;
+    }
+
+    .mascot-orbit-item[data-offset='0'] {
+      --orbit-y: -0.65rem;
+    }
+
+    .mascot-orbit-item.is-current {
+      height: 4.7rem;
+      width: 4.7rem;
+    }
+  }
+</style>
