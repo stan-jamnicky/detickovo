@@ -33,10 +33,17 @@ async function verifyRecaptcha(token: string, secret: string, expectedHostname: 
     body: new URLSearchParams({ secret, response: token }),
     signal: AbortSignal.timeout(8_000),
   });
-  if (!response.ok) return false;
+  if (!response.ok) {
+    console.warn('[objednavka] recaptcha siteverify HTTP error', response.status);
+    return false;
+  }
 
-  const result = await response.json() as { success?: boolean; hostname?: string };
-  return result.success === true && result.hostname === expectedHostname;
+  const result = await response.json() as { success?: boolean; hostname?: string; 'error-codes'?: string[] };
+  if (result.success !== true || result.hostname !== expectedHostname) {
+    console.warn('[objednavka] recaptcha rejected', { success: result.success, gotHostname: result.hostname, expectedHostname, errorCodes: result['error-codes'] });
+    return false;
+  }
+  return true;
 }
 
 export const POST: APIRoute = async ({ request, clientAddress, url }) => {
@@ -59,9 +66,13 @@ export const POST: APIRoute = async ({ request, clientAddress, url }) => {
   }
 
   if (data.botcheck) return json(200, true);
-  const inquiry = normalizeOrderInquiry(data);
+  const inquiryReasons: string[] = [];
+  const inquiry = normalizeOrderInquiry(data, inquiryReasons);
   const recaptchaToken = typeof data.recaptchaToken === 'string' ? data.recaptchaToken : '';
-  if (!inquiry || !recaptchaToken || recaptchaToken.length > 4_000) return json(422, false);
+  if (!inquiry || !recaptchaToken || recaptchaToken.length > 4_000) {
+    console.warn('[objednavka] rejected payload', { reasons: inquiryReasons, hasToken: !!recaptchaToken, tokenLength: recaptchaToken.length });
+    return json(422, false);
+  }
 
   const recaptchaSecret = configured('RECAPTCHA_SECRET_KEY');
   const rateLimitSalt = configured('RATE_LIMIT_SALT');

@@ -47,16 +47,27 @@ function isIsoDate(value: string): boolean {
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
-export function normalizeOrderInquiry(data: Record<string, unknown>): OrderInquiry | undefined {
+export function normalizeOrderInquiry(data: Record<string, unknown>, reasons?: string[]): OrderInquiry | undefined {
+  const fail = (reason: string) => {
+    reasons?.push(reason);
+    return undefined;
+  };
+
   const eventType = required(data, 'Typ akcie', 100);
   const location = required(data, 'Miesto', 300);
   const name = required(data, 'Meno', 160);
   const phone = required(data, 'Telefón', 32);
   const email = required(data, 'email', 254)?.toLowerCase();
 
-  if (!eventType || !location || !name || !phone || !email || !EVENT_TYPE_LABELS.has(eventType)) return undefined;
-  if (!/^[0-9+(). -]{6,32}$/.test(phone) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return undefined;
-  if (data['GDPR súhlas'] !== 'áno') return undefined;
+  if (!eventType) return fail('eventType missing');
+  if (!EVENT_TYPE_LABELS.has(eventType)) return fail(`eventType not recognized: ${eventType}`);
+  if (!location) return fail('location missing');
+  if (!name) return fail('name missing');
+  if (!phone) return fail('phone missing');
+  if (!email) return fail('email missing');
+  if (!/^[0-9+(). -]{6,32}$/.test(phone)) return fail('phone failed format check');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail('email failed format check');
+  if (data['GDPR súhlas'] !== 'áno') return fail('GDPR consent not given');
 
   const isCamp = eventType === 'Pobytový tábor';
   const inquiry: OrderInquiry = {
@@ -72,7 +83,9 @@ export function normalizeOrderInquiry(data: Record<string, unknown>): OrderInqui
   if (isCamp) {
     const campChildInfo = required(data, 'tabor-deti-info', 500);
     const campDiet = required(data, 'tabor_strava', 100);
-    if (!campChildInfo || !campDiet || !CAMP_DIETS.has(campDiet)) return undefined;
+    if (!campChildInfo) return fail('campChildInfo missing');
+    if (!campDiet) return fail('campDiet missing');
+    if (!CAMP_DIETS.has(campDiet)) return fail(`campDiet not recognized: ${campDiet}`);
     inquiry.campChildInfo = campChildInfo;
     inquiry.campDiet = campDiet;
     inquiry.campHealthInfo = text(data['tabor-zdravie-info'], 1_000);
@@ -81,10 +94,13 @@ export function normalizeOrderInquiry(data: Record<string, unknown>): OrderInqui
     const date = required(data, 'Dátum', 10);
     const time = required(data, 'Čas', 100);
     const children = required(data, 'Počet detí', 100);
-    if (!date || !time || !children || !isIsoDate(date)) return undefined;
+    if (!date) return fail('date missing');
+    if (!time) return fail('time missing');
+    if (!children) return fail('children missing');
+    if (!isIsoDate(date)) return fail(`date not ISO format: ${date}`);
     if (eventType === 'Iná akcia') {
       const otherEventDescription = required(data, 'Popis inej akcie', 300);
-      if (!otherEventDescription) return undefined;
+      if (!otherEventDescription) return fail('otherEventDescription missing');
       inquiry.otherEventDescription = otherEventDescription;
     }
     inquiry.date = date;
