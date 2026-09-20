@@ -497,6 +497,9 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
     pocetDetiWrap.hidden = isTabor;
     pocetDetiSelect.required = !isTabor;
 
+    // Only require the (hidden, otherwise unfocusable) tabor_strava radio group when tábor is selected
+    taborStravaInputs.forEach((input, idx) => (input.required = isTabor && idx === 0));
+
     miestoWrap.classList.toggle('sm:col-span-2', isTabor);
 
     if (isTabor) {
