@@ -47,6 +47,17 @@ function isIsoDate(value: string): boolean {
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
+// Some browsers/extensions write a locale-formatted string (e.g. autofill) into <input type="date">
+// instead of the spec-mandated ISO value; accept the Slovak dd.mm.yyyy form as a fallback.
+function toIsoDate(value: string): string | undefined {
+  if (isIsoDate(value)) return value;
+  const match = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(value);
+  if (!match) return undefined;
+  const [, day, month, year] = match;
+  const iso = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  return isIsoDate(iso) ? iso : undefined;
+}
+
 export function normalizeOrderInquiry(data: Record<string, unknown>, reasons?: string[]): OrderInquiry | undefined {
   const fail = (reason: string) => {
     reasons?.push(reason);
@@ -91,13 +102,14 @@ export function normalizeOrderInquiry(data: Record<string, unknown>, reasons?: s
     inquiry.campHealthInfo = text(data['tabor-zdravie-info'], 1_000);
     inquiry.services = 'Kompletný táborový program (animátori, maskoti, hry)';
   } else {
-    const date = required(data, 'Dátum', 10);
+    const rawDate = required(data, 'Dátum', 10);
     const time = required(data, 'Čas', 100);
     const children = required(data, 'Počet detí', 100);
-    if (!date) return fail('date missing');
+    if (!rawDate) return fail('date missing');
     if (!time) return fail('time missing');
     if (!children) return fail('children missing');
-    if (!isIsoDate(date)) return fail(`date not ISO format: ${date}`);
+    const date = toIsoDate(rawDate);
+    if (!date) return fail(`date not ISO format: ${rawDate}`);
     if (eventType === 'Iná akcia') {
       const otherEventDescription = required(data, 'Popis inej akcie', 300);
       if (!otherEventDescription) return fail('otherEventDescription missing');

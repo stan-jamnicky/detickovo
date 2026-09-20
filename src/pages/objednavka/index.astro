@@ -732,6 +732,12 @@ const childrenOptions = ['do 15 detí', '15 – 50 detí', '50 – 150 detí', '
       }
       payload.recaptchaToken = recaptchaToken;
 
+      // Some browser autofill/extensions write a locale-formatted string into the date
+      // input instead of the spec-mandated ISO value; rebuild it from valueAsDate to be safe
+      if (!isTaborSelected() && datumInput.valueAsDate) {
+        payload['Dátum'] = datumInput.valueAsDate.toISOString().slice(0, 10);
+      }
+
       // Customize payload for Pobytový tábor
       if (isTaborSelected()) {
         payload['Dátum'] = 'Letný turnus (1 turnus v roku – potvrdíme e-mailom)';
